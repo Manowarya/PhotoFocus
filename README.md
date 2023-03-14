@@ -5,3 +5,5 @@
 Карасев С.Э.
 Павлов Я.Э.
 # Ссылки
+# Доска на Miro
+https://miro.com/app/board/uXjVMeARGvs=/
