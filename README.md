@@ -16,4 +16,4 @@
 
 [Диаграммы](https://github.com/Manowarya/PhotoFocus/tree/main/documentation/diagrams)
 
-[Техническое задание](https://github.com/Manowarya/PhotoFocus/blob/main/documentation/TZ_PhotoFocus.pdf)
+[Техническое задание](https://github.com/Manowarya/PhotoFocus/blob/main/documentation/Technical%20specification_PhotoFocus.pdf)
