@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context=".EditImageActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/background"
+        android:theme="@android:style/ThemeOverlay.Material.ActionBar"
+        app:elevation="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/backBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:layout_marginStart="@dimen/_1sdp"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:backgroundTint="@color/gray"
+                app:drawableTopCompat="@drawable/ic_arrow_back" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveLoad"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="end"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginEnd="@dimen/_15sdp"
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:text="@string/save"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp"
+                app:cornerRadius="@dimen/_20sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/appCompatImageView"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@color/button"
+                tools:layout_editor_absoluteX="16dp" />
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/imageCard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/_20sdp"
+        app:cardBackgroundColor="@color/gray"
+        app:cardElevation="0dp"
+        app:layout_constraintDimensionRatio="9:13"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appbar">
+
+        <ImageView
+            android:id="@+id/imagePreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.canhub.cropper.CropImageView
+        android:id="@+id/cropImageView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/_20sdp"
+        app:layout_constraintDimensionRatio="9:13"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appbar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/editToolsWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <HorizontalScrollView
+            android:id="@+id/toolsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/_8sdp">
+
+                <TextView
+                    android:id="@+id/cropBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_12sdp"
+                    android:drawablePadding="@dimen/_5sdp"
+                    android:text="@string/framing"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_14sdp"
+                    app:drawableTopCompat="@drawable/ic_hexagon" />
+
+                <TextView
+                    android:id="@+id/correctionBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_12sdp"
+                    android:drawablePadding="@dimen/_5sdp"
+                    android:text="@string/correction"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_14sdp"
+                    app:drawableTopCompat="@drawable/ic_hexagon" />
+
+                <TextView
+                    android:id="@+id/textBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_12sdp"
+                    android:drawablePadding="@dimen/_5sdp"
+                    android:text="@string/text"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_14sdp"
+                    app:drawableTopCompat="@drawable/ic_hexagon" />
+
+                <TextView
+                    android:id="@+id/autocorrectionBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_12sdp"
+                    android:drawablePadding="@dimen/_5sdp"
+                    android:text="@string/autocorrection"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_14sdp"
+                    app:drawableTopCompat="@drawable/ic_hexagon" />
+
+                <TextView
+                    android:id="@+id/templatesBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_12sdp"
+                    android:drawablePadding="@dimen/_5sdp"
+                    android:text="@string/templates"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_14sdp"
+                    app:drawableTopCompat="@drawable/ic_hexagon" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <include layout="@layout/crop" />
+
+        <include layout="@layout/correction" />
+
+        <include layout="@layout/text" />
+
+        <include layout="@layout/autocorretion" />
+
+        <include layout="@layout/templates" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
