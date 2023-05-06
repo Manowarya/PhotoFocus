@@ -35,7 +35,7 @@
                 app:drawableTopCompat="@drawable/ic_arrow_back" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/saveLoad"
+                android:id="@+id/saveBtn"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -87,7 +87,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/editToolsWrapper"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="150dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <HorizontalScrollView

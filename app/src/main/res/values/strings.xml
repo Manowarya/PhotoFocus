@@ -10,11 +10,15 @@
     <string name="_1_3">16:9</string>
     <string name="_1_2">1:2</string>
     <string name="_1_1">1:1</string>
-    <string name="fixcroping">Соотношение \n сторон</string>
+    <string name="fixcropping">Соотношение \n сторон</string>
     <string name="croping">Обрезать</string>
     <string name="rotation">Повернуть</string>
     <string name="cropOriginal">Оригинал</string>
     <string name="crop1_4">4:3</string>
     <string name="crop1_5">3:1</string>
     <string name="crop1_6">A4</string>
+    <string name="hor">Отразить \n по гор</string>
+    <string name="vert">Отразить \n по верт</string>
+    <string name="right">Направо</string>
+    <string name="left">Налево</string>
 </resources>

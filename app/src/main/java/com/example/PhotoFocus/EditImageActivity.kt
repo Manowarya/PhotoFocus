@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -34,15 +35,36 @@ class EditImageActivity : AppCompatActivity() {
 
     private fun crop() {
         val cropTools = findViewById<ConstraintLayout>(R.id.cropBtnsLayout)
-        val cropping = findViewById<TextView>(R.id.croping)
+        val cropping = findViewById<TextView>(R.id.cropping)
         val backBtn = findViewById<Button>(R.id.backBtn)
+        val saveBtn = findViewById<Button>(R.id.saveBtn)
+        val fixcropping = findViewById<TextView>(R.id.fixcropping)
+        val fixCropLayout = findViewById<LinearLayout>(R.id.fixCropLayout)
+        val rotationLayout = findViewById<LinearLayout>(R.id.rotationLayout)
+        val rotation = findViewById<TextView>(R.id.rotation)
 
         editImageBinding.cropBtn.setOnClickListener{
+            saveBtn.visibility = View.GONE
             cropTools.visibility = View.VISIBLE
+            editImageBinding.cropImageView.setImageBitmap(bitmap)
+            editImageBinding.imagePreview.setImageResource(0)
+            fixcropping.setTextColor(resources.getColor(R.color.button))
+            fixCropLayout.visibility=View.VISIBLE
+            rotationLayout.visibility=View.GONE
+            cropping.setTextColor(resources.getColor(R.color.white))
+            rotation.setTextColor(resources.getColor(R.color.white))
             cropping.setOnClickListener {
-                editImageBinding.cropImageView.setImageBitmap(bitmap)
+                editImageBinding.cropImageView.setFixedAspectRatio(false)
+                fixCropLayout.visibility=View.GONE
+                rotationLayout.visibility=View.GONE
+                cropping.setTextColor(resources.getColor(R.color.button))
+                rotation.setTextColor(resources.getColor(R.color.white))
+                fixcropping.setTextColor(resources.getColor(R.color.white))
             }
             backBtn.setOnClickListener{
+                saveBtn.visibility = View.VISIBLE
+                rotation.setTextColor(resources.getColor(R.color.white))
+                cropping.setTextColor(resources.getColor(R.color.white))
                 cropTools.visibility = View.GONE
                 bitmap = editImageBinding.cropImageView.getCroppedImage()!!
                 editImageBinding.imagePreview.setImageBitmap(bitmap)
