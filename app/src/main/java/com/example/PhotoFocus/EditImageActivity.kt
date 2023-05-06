@@ -41,6 +41,12 @@ class EditImageActivity : AppCompatActivity() {
         val fixcropping = findViewById<TextView>(R.id.fixcropping)
 
         val fixCropLayout = findViewById<LinearLayout>(R.id.fixCropLayout)
+        val cropOriginal = findViewById<TextView>(R.id.cropOriginal)
+        val crop1_1 = findViewById<TextView>(R.id.crop1_1)
+        val crop1_2 = findViewById<TextView>(R.id.crop1_2)
+        val crop16_9 = findViewById<TextView>(R.id.crop16_9)
+        val crop4_3 = findViewById<TextView>(R.id.crop4_3)
+        val crop3_1 = findViewById<TextView>(R.id.crop3_1)
 
         val rotationLayout = findViewById<LinearLayout>(R.id.rotationLayout)
         val leftRotation = findViewById<TextView>(R.id.left)
@@ -59,6 +65,24 @@ class EditImageActivity : AppCompatActivity() {
             rotationLayout.visibility=View.GONE
             cropping.setTextColor(resources.getColor(R.color.white))
             rotation.setTextColor(resources.getColor(R.color.white))
+            cropOriginal.setOnClickListener {
+                editImageBinding.cropImageView.setFixedAspectRatio(false)
+            }
+            crop1_1.setOnClickListener {
+                editImageBinding.cropImageView.setAspectRatio(1,1)
+            }
+            crop1_2.setOnClickListener {
+                editImageBinding.cropImageView.setAspectRatio(1,2)
+            }
+            crop16_9.setOnClickListener {
+                editImageBinding.cropImageView.setAspectRatio(16,9)
+            }
+            crop4_3.setOnClickListener {
+                editImageBinding.cropImageView.setAspectRatio(4,3)
+            }
+            crop3_1.setOnClickListener {
+                editImageBinding.cropImageView.setAspectRatio(3,1)
+            }
             cropping.setOnClickListener {
                 editImageBinding.cropImageView.setFixedAspectRatio(false)
                 fixCropLayout.visibility=View.GONE
