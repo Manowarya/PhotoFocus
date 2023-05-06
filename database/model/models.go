@@ -12,7 +12,7 @@ type User struct {
 
 type Template struct {
 	ID        int64   `json:"id"`
-	UserID    int64   `json:"user_id"`
+	UserId    int64   `json:"id"`
 	Text      string  `json:"text"`
 	FontSize  int64   `json:"font_size"`
 	TextColor string  `json:"text_color"`
@@ -25,31 +25,40 @@ type Template struct {
 }
 
 type Templates struct {
-	Devices []Template `json:"items"`
+	Templates []Template `json:"items"`
 }
 
-func GetTemplates(db *sql.DB, userId string) (Template, error) {
-	template := Template{}
+func GetTemplates(db *sql.DB, userId string) (Templates, error) {
+	templates := Templates{}
 
 	if len(userId) <= 0 {
-		return template, nil
+		return templates, nil
 	}
 
-	err := db.QueryRow("SELECT * FROM templates WHERE user_id=?", userId).Scan(
-		&template.ID,
-		&template.UserID,
-		&template.Text,
-		&template.FontSize,
-		&template.TextColor,
-		&template.Font,
-		&template.Light,
-		&template.Bokeh,
-		&template.Color,
-		&template.Grain,
-		&template.Vignette)
-	if err != nil {
-		//return CreateSettings(db, uuid)
+	rows, err := db.Query("SELECT * FROM templates WHERE user_id=?", userId)
+
+	defer rows.Close()
+
+	for rows.Next() {
+		template := Template{}
+		err = rows.Scan(
+			&template.ID,
+			&template.UserId,
+			&template.Text,
+			&template.FontSize,
+			&template.TextColor,
+			&template.Font,
+			&template.Light,
+			&template.Bokeh,
+			&template.Color,
+			&template.Grain,
+			&template.Vignette)
+		if err != nil {
+			return templates, err
+		}
+
+		templates.Templates = append(templates.Templates, template)
 	}
 
-	return template, err
+	return templates, err
 }
