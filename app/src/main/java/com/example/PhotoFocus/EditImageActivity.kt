@@ -39,8 +39,14 @@ class EditImageActivity : AppCompatActivity() {
         val backBtn = findViewById<Button>(R.id.backBtn)
         val saveBtn = findViewById<Button>(R.id.saveBtn)
         val fixcropping = findViewById<TextView>(R.id.fixcropping)
+
         val fixCropLayout = findViewById<LinearLayout>(R.id.fixCropLayout)
+
         val rotationLayout = findViewById<LinearLayout>(R.id.rotationLayout)
+        val leftRotation = findViewById<TextView>(R.id.left)
+        val rightRotation = findViewById<TextView>(R.id.right)
+        val flipHor = findViewById<TextView>(R.id.hor)
+        val flipVert = findViewById<TextView>(R.id.vert)
         val rotation = findViewById<TextView>(R.id.rotation)
 
         editImageBinding.cropBtn.setOnClickListener{
@@ -60,6 +66,25 @@ class EditImageActivity : AppCompatActivity() {
                 cropping.setTextColor(resources.getColor(R.color.button))
                 rotation.setTextColor(resources.getColor(R.color.white))
                 fixcropping.setTextColor(resources.getColor(R.color.white))
+            }
+            rotation.setOnClickListener {
+                fixCropLayout.visibility=View.GONE
+                rotationLayout.visibility=View.VISIBLE
+                rotation.setTextColor(resources.getColor(R.color.button))
+                cropping.setTextColor(resources.getColor(R.color.white))
+                fixcropping.setTextColor(resources.getColor(R.color.white))
+                leftRotation.setOnClickListener {
+                    editImageBinding.cropImageView.rotateImage(-90)
+                }
+                rightRotation.setOnClickListener {
+                    editImageBinding.cropImageView.rotateImage(90)
+                }
+                flipHor.setOnClickListener {
+                    editImageBinding.cropImageView.flipImageHorizontally()
+                }
+                flipVert.setOnClickListener {
+                    editImageBinding.cropImageView.flipImageVertically()
+                }
             }
             backBtn.setOnClickListener{
                 saveBtn.visibility = View.VISIBLE
