@@ -154,3 +154,13 @@ Java_com_example_PhotoFocus_EditImageActivity_myBright(JNIEnv *env, jobject, job
     myBright(src, sigma);
     matToBitmap(env, src, bitmap_out, false);
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myExposition(JNIEnv *env, jobject, jobject bitmap_in,
+                                                       jobject bitmap_out, jfloat sigma) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    myExposition(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
+}

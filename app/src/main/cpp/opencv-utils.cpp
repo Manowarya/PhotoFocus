@@ -70,3 +70,14 @@ void myBright(Mat image, float sigma) {
     image.convertTo(dst, -1, alpha,beta);
     convertScaleAbs(dst, image);
 }
+
+void myExposition(Mat& image, float exposure_factor) {
+    Mat lookup_table(1, 256, CV_8U); // Создаем таблицу преобразования для изменения яркости
+
+    for (int i = 0; i < 256; i++) {
+        int adjusted_value = saturate_cast<uchar>(i * exposure_factor);
+        lookup_table.at<uchar>(i) = adjusted_value;
+    }
+
+    LUT(image, lookup_table, image); // Применяем таблицу преобразования к изображению
+}
