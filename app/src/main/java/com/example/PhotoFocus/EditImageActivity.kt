@@ -31,6 +31,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private var selectedTextView: TextView? = null
     private var selectedLinearLayout: LinearLayout? = null
 
+    private var toneSeekBar: SeekBar? = null
     private var brightSeekBar: SeekBar? = null
     private var blurSeekBar: SeekBar? = null
     private var noiseSeekBar: SeekBar? = null
@@ -165,10 +166,12 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         val blur = findViewById<TextView>(R.id.blur)
         val vignette = findViewById<TextView>(R.id.vignette)
 
+        toneSeekBar = findViewById(R.id.toneSeekBar)
         brightSeekBar = findViewById(R.id.brightSeekBar)
         noiseSeekBar = findViewById(R.id.noiseSeekBar)
         blurSeekBar = findViewById(R.id.blurSeekBar)
 
+        toneSeekBar!!.setOnSeekBarChangeListener(this)
         blurSeekBar!!.setOnSeekBarChangeListener(this)
         noiseSeekBar!!.setOnSeekBarChangeListener(this)
         brightSeekBar!!.setOnSeekBarChangeListener(this)
@@ -203,7 +206,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         correctionTools.visibility = View.VISIBLE
 
     }
-
     private fun handleTextViewClick(textView: TextView) {
         selectedTextView?.setTextColor(resources.getColor(R.color.white))
         textView.setTextColor(resources.getColor(R.color.button))
@@ -217,19 +219,23 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
 
     external fun myBlur(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun myNoise(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    external fun myTone(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun myBright(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
 
-    private var brightness: Float = 0.0F
+    private var tone: Float = 0.0F
+    private var bright: Float = 0.0F
     private var blur: Float = 0.0F
     private var noise: Float = 0.0F
     fun applyEffects() {
         val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
-        brightness = max(0.1F, brightSeekBar!!.progress / 10F)
+        tone = max(0.1F, toneSeekBar!!.progress / 10F)
+        bright = max(0.1F, brightSeekBar!!.progress / 10F)
         blur = max(0.1F, blurSeekBar!!.progress / 10F)
         noise =  max(0.1F, noiseSeekBar!!.progress / 10F)
-        myBright(tempBitmap, tempBitmap, brightness)
+        myBright(tempBitmap, tempBitmap, bright)
         myBlur(tempBitmap, tempBitmap, blur)
         myNoise(tempBitmap, tempBitmap, noise)
+        myTone(tempBitmap, tempBitmap, tone)
 
         dstBitmap = tempBitmap
 
@@ -240,22 +246,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     override fun onStartTrackingTouch(p0: SeekBar?) {}
 
     override fun onStopTrackingTouch(p0: SeekBar?) {
-        when (p0!!.getId()) {
-            R.id.blurSeekBar -> {
-                thread {
-                    applyEffects()
-                }
-            }
-            R.id.noiseSeekBar -> {
-                thread {
-                    applyEffects()
-                }
-            }
-            R.id.brightSeekBar -> {
-                thread {
-                   applyEffects()
-                }
-            }
+        thread {
+            applyEffects()
         }
     }
 }

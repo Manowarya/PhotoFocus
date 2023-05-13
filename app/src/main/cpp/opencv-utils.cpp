@@ -2,11 +2,11 @@
 #include <opencv2/imgproc.hpp>
 #include <thread>
 
-void myFlip(Mat src) {
-    flip(src, src, 0);
+void myFlip(Mat image) {
+    flip(image, image, 0);
 }
-void myBlur(Mat src, float sigma) {
-    GaussianBlur(src, src, Size(), sigma);
+void myBlur(Mat image, float sigma) {
+    GaussianBlur(image, image, Size(), sigma);
 }
 void myNoise(Mat image, float sigma) {
     std::vector<Mat> channels;
@@ -26,6 +26,29 @@ void myNoise(Mat image, float sigma) {
     }
     merge(channels, image);
 }
+
+void myTone(Mat& image, float sigma)
+{
+    cvtColor(image, image, cv::COLOR_BGR2HSV);
+
+    for (int i = 0; i < image.rows; i++)
+    {
+        for (int j = 0; j < image.cols; j++)
+        {
+            Vec3b& pixel = image.at<Vec3b>(i, j);
+            int hue = static_cast<int>(pixel[0] + sigma);
+
+            if (hue < 0)
+                hue += 180;
+            else if (hue > 179)
+                hue -= 180;
+
+            pixel[0] = static_cast<uchar>(hue);
+        }
+    }
+    cvtColor(image, image, COLOR_HSV2BGR);
+}
+
 
 void myBright(Mat image, float sigma) {
     Mat dst;
