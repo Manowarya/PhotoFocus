@@ -2,6 +2,7 @@ package com.example.PhotoFocus
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val REQUEST_CODE_PICK_IMAGE = 1
         const val KEY_IMAGE_URI = "imageUri"
+
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -43,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data.let {imageUri ->
                 Intent(applicationContext, EditImageActivity::class.java).also { editImageIntent ->
-                    editImageIntent.putExtra(KEY_IMAGE_URI, imageUri)
+                    editImageIntent.putExtra(KEY_IMAGE_URI, imageUri.toString())
                     startActivity(editImageIntent)
                 }
             }

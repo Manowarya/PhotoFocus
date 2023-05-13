@@ -1,39 +1,68 @@
 package com.example.PhotoFocus
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.HorizontalScrollView
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.canhub.cropper.*
+import androidx.core.graphics.drawable.toBitmap
 import com.example.PhotoFocus.databinding.EditImageBinding
+import java.lang.Float.max
+import kotlin.concurrent.thread
 
-class EditImageActivity : AppCompatActivity() {
+class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
+    companion object {
+        init {
+            System.loadLibrary("native-lib")
+        }
+    }
+    var bitmap: Bitmap? = null
+    var dstBitmap: Bitmap? = null
 
     private lateinit var editImageBinding: EditImageBinding
 
-    private lateinit var bitmap: Bitmap
+    private var selectedTextView: TextView? = null
+    private var selectedLinearLayout: LinearLayout? = null
 
+    private var blurSeekBar: SeekBar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         editImageBinding = EditImageBinding.inflate(layoutInflater)
-
         supportActionBar?.hide()
-
-        displayImagePreview()
         setContentView(editImageBinding.root)
 
-        crop()
+        val extras = intent.extras ?: return
+        val uriString = extras.getString(MainActivity.KEY_IMAGE_URI)
+        val view = findViewById<ImageView>(R.id.imagePreview)
+        view.setImageURI(Uri.parse(uriString))
+
+        val toolsLayout = findViewById<HorizontalScrollView>(R.id.toolsLayout)
+        editImageBinding.cropBtn.setOnClickListener {
+            toolsLayout.visibility=View.GONE
+            crop(toolsLayout)
+        }
+
+        view.visibility = View.VISIBLE
+
+        bitmap = (view.drawable as BitmapDrawable).bitmap
+
+        dstBitmap = bitmap!!.copy(bitmap!!.config, true)
+
+        editImageBinding.correctionBtn.setOnClickListener {
+            toolsLayout.visibility=View.GONE
+            correction()
+        }
     }
 
-    private fun crop() {
+    private fun crop(toolsLayout: HorizontalScrollView) {
         val cropTools = findViewById<ConstraintLayout>(R.id.cropBtnsLayout)
         val cropping = findViewById<TextView>(R.id.cropping)
         val backBtn = findViewById<Button>(R.id.backBtn)
@@ -55,89 +84,177 @@ class EditImageActivity : AppCompatActivity() {
         val flipVert = findViewById<TextView>(R.id.vert)
         val rotation = findViewById<TextView>(R.id.rotation)
 
-        editImageBinding.cropBtn.setOnClickListener{
-            saveBtn.visibility = View.GONE
-            cropTools.visibility = View.VISIBLE
-            editImageBinding.cropImageView.setImageBitmap(bitmap)
-            editImageBinding.imagePreview.setImageResource(0)
-            fixcropping.setTextColor(resources.getColor(R.color.button))
-            fixCropLayout.visibility=View.VISIBLE
-            rotationLayout.visibility=View.GONE
-            cropping.setTextColor(resources.getColor(R.color.white))
-            rotation.setTextColor(resources.getColor(R.color.white))
+        saveBtn.visibility = View.GONE
+        cropTools.visibility = View.VISIBLE
+        editImageBinding.cropImageView.setImageBitmap(bitmap)
+        editImageBinding.imagePreview.setImageResource(0)
+
+        selectedLinearLayout = fixCropLayout
+        handleTextViewClick(fixcropping)
+
+        fixcropping.setOnClickListener {
+            handleTextViewClick(fixcropping)
+            linearLayoutVisible(fixCropLayout)
             cropOriginal.setOnClickListener {
                 editImageBinding.cropImageView.setFixedAspectRatio(false)
             }
             crop1_1.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(1,1)
+                editImageBinding.cropImageView.setAspectRatio(1, 1)
             }
             crop1_2.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(1,2)
+                editImageBinding.cropImageView.setAspectRatio(1, 2)
             }
             crop16_9.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(16,9)
+                editImageBinding.cropImageView.setAspectRatio(16, 9)
             }
             crop4_3.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(4,3)
+                editImageBinding.cropImageView.setAspectRatio(4, 3)
             }
             crop3_1.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(3,1)
+                editImageBinding.cropImageView.setAspectRatio(3, 1)
             }
-            cropping.setOnClickListener {
-                editImageBinding.cropImageView.setFixedAspectRatio(false)
-                fixCropLayout.visibility=View.GONE
-                rotationLayout.visibility=View.GONE
-                cropping.setTextColor(resources.getColor(R.color.button))
-                rotation.setTextColor(resources.getColor(R.color.white))
-                fixcropping.setTextColor(resources.getColor(R.color.white))
+        }
+
+        cropping.setOnClickListener {
+            handleTextViewClick(cropping)
+            editImageBinding.cropImageView.setFixedAspectRatio(false)
+            fixCropLayout.visibility = View.GONE
+            rotationLayout.visibility = View.GONE
+        }
+        rotation.setOnClickListener {
+            handleTextViewClick(rotation)
+            linearLayoutVisible(rotationLayout)
+            leftRotation.setOnClickListener {
+                editImageBinding.cropImageView.rotateImage(-90)
             }
-            rotation.setOnClickListener {
-                fixCropLayout.visibility=View.GONE
-                rotationLayout.visibility=View.VISIBLE
-                rotation.setTextColor(resources.getColor(R.color.button))
-                cropping.setTextColor(resources.getColor(R.color.white))
-                fixcropping.setTextColor(resources.getColor(R.color.white))
-                leftRotation.setOnClickListener {
-                    editImageBinding.cropImageView.rotateImage(-90)
-                }
-                rightRotation.setOnClickListener {
-                    editImageBinding.cropImageView.rotateImage(90)
-                }
-                flipHor.setOnClickListener {
-                    editImageBinding.cropImageView.flipImageHorizontally()
-                }
-                flipVert.setOnClickListener {
-                    editImageBinding.cropImageView.flipImageVertically()
-                }
+            rightRotation.setOnClickListener {
+                editImageBinding.cropImageView.rotateImage(90)
             }
-            backBtn.setOnClickListener{
-                saveBtn.visibility = View.VISIBLE
-                rotation.setTextColor(resources.getColor(R.color.white))
-                cropping.setTextColor(resources.getColor(R.color.white))
-                cropTools.visibility = View.GONE
-                bitmap = editImageBinding.cropImageView.getCroppedImage()!!
-                editImageBinding.imagePreview.setImageBitmap(bitmap)
-                editImageBinding.cropImageView.clearImage()
+            flipHor.setOnClickListener {
+                editImageBinding.cropImageView.flipImageHorizontally()
             }
+            flipVert.setOnClickListener {
+                editImageBinding.cropImageView.flipImageVertically()
+            }
+        }
+        backBtn.setOnClickListener{
+            saveBtn.visibility = View.VISIBLE
+            toolsLayout.visibility=View.VISIBLE
+            rotation.setTextColor(resources.getColor(R.color.white))
+            cropping.setTextColor(resources.getColor(R.color.white))
+            cropTools.visibility = View.GONE
+            bitmap = editImageBinding.cropImageView.getCroppedImage()!!
+            editImageBinding.imagePreview.setImageBitmap(bitmap)
+            editImageBinding.cropImageView.clearImage()
         }
     }
 
-    private fun displayImagePreview() {
-        if (Build.VERSION.SDK_INT >= 33) {
-            intent.getParcelableExtra(MainActivity.KEY_IMAGE_URI, Uri::class.java)?.let { imageUri ->
-                val inputStream = contentResolver.openInputStream(imageUri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                editImageBinding.imagePreview.setImageBitmap(bitmap)
-                editImageBinding.imagePreview.visibility = View.VISIBLE
+    private fun correction() {
+        val correctionTools = findViewById<ConstraintLayout>(R.id.correctionBtnsLayout)
+        val colorLinearLayout = findViewById<LinearLayout>(R.id.colorLinearLayout)
+        val lightLinearLayout = findViewById<LinearLayout>(R.id.lightLinearLayout)
+        val blurLinearLayout = findViewById<LinearLayout>(R.id.blurLinearLayout)
+        val noiseLinearLayout = findViewById<LinearLayout>(R.id.noiseLinearLayout)
+        val vignetteLinearLayout = findViewById<LinearLayout>(R.id.vignetteLinearLayout)
+
+        val color = findViewById<TextView>(R.id.color)
+        val light = findViewById<TextView>(R.id.light)
+        val noise = findViewById<TextView>(R.id.noise)
+        val blur = findViewById<TextView>(R.id.blur)
+        val vignette = findViewById<TextView>(R.id.vignette)
+
+        val toneSeekBar = findViewById<SeekBar>(R.id.toneSeekBar)
+        val saturationSeekBar = findViewById<SeekBar>(R.id.saturationSeekBar)
+        val brightSeekBar = findViewById<SeekBar>(R.id.brightSeekBar)
+        val expositionSeekBar = findViewById<SeekBar>(R.id.expositionSeekBar)
+        val contrastSeekBar = findViewById<SeekBar>(R.id.contrastSeekBar)
+        val noiseSeekBar = findViewById<SeekBar>(R.id.noiseSeekBar)
+        blurSeekBar = findViewById(R.id.blurSeekBar)
+        val vignetteSeekBar = findViewById<SeekBar>(R.id.vignetteSeekBar)
+
+        blurSeekBar!!.setOnSeekBarChangeListener(this)
+        noiseSeekBar.setOnSeekBarChangeListener(this)
+
+        selectedLinearLayout = colorLinearLayout
+        handleTextViewClick(color)
+
+        color.setOnClickListener{
+            handleTextViewClick(color)
+            linearLayoutVisible(colorLinearLayout)
+        }
+        light.setOnClickListener{
+            handleTextViewClick(light)
+            linearLayoutVisible(lightLinearLayout)
+        }
+        noise.setOnClickListener {
+            handleTextViewClick(noise)
+            linearLayoutVisible(noiseLinearLayout)
+        }
+        blur.setOnClickListener {
+            handleTextViewClick(blur)
+            linearLayoutVisible(blurLinearLayout)
+
+            dstBitmap = bitmap!!.copy(bitmap!!.config, true)
+        }
+        vignette.setOnClickListener{
+            handleTextViewClick(vignette)
+            linearLayoutVisible(vignetteLinearLayout)
+        }
+
+        correctionTools.visibility = View.VISIBLE
+
+    }
+
+    private fun handleTextViewClick(textView: TextView) {
+        selectedTextView?.setTextColor(resources.getColor(R.color.white))
+        textView.setTextColor(resources.getColor(R.color.button))
+        selectedTextView = textView
+    }
+    private fun linearLayoutVisible(linearLayout: LinearLayout) {
+        selectedLinearLayout?.visibility=View.GONE
+        linearLayout.visibility=View.VISIBLE
+        selectedLinearLayout = linearLayout
+    }
+
+    external fun myBlur(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+
+    external fun myNoise(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    fun doBlur() {
+        val sigma = max(0.1F, blurSeekBar!!.progress / 10F)
+
+        this.myBlur(bitmap!!, dstBitmap!!, sigma)
+
+        editImageBinding.imagePreview.setImageBitmap(dstBitmap)
+    }
+
+    fun doNoise(progress: Int) {
+        this.doBlur()
+        val sigma = max(0.1F, progress / 10F)
+        val drawable = editImageBinding.imagePreview.drawable
+        val srcBitmap = drawable.toBitmap()
+
+        this.myNoise(srcBitmap, dstBitmap!!, sigma)
+
+        editImageBinding.imagePreview.setImageBitmap(dstBitmap)
+    }
+
+    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+    }
+    override fun onStartTrackingTouch(p0: SeekBar?) {}
+
+    override fun onStopTrackingTouch(p0: SeekBar?) {
+        when (p0!!.getId()) {
+            R.id.blurSeekBar -> {
+                thread {
+                    doBlur()
+                }
             }
-        }else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra<Uri>(MainActivity.KEY_IMAGE_URI).let { imageUri ->
-                val inputStream = imageUri?.let { contentResolver.openInputStream(it) }
-                bitmap = BitmapFactory.decodeStream(inputStream)
-                editImageBinding.imagePreview.setImageBitmap(bitmap)
-                editImageBinding.imagePreview.visibility = View.VISIBLE
+            R.id.noiseSeekBar -> {
+                thread {
+                    doNoise(p0.progress)
+                }
             }
         }
     }
 }
+

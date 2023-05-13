@@ -1,11 +1,9 @@
 #include <jni.h>
 #include <string>
-#include "opencv-utils.h"
 #include <android/bitmap.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-
-using namespace cv;
+#include "opencv-utils.h"
 
 void bitmapToMat(JNIEnv *env, jobject bitmap, Mat& dst, jboolean needUnPremultiplyAlpha)
 {
@@ -87,25 +85,42 @@ void matToBitmap(JNIEnv* env, Mat src, jobject bitmap, jboolean needPremultiplyA
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_example_opencv2_MainActivity_stringFromJNI(
-        JNIEnv* env,
+Java_com_example_PhotoFocus_EditImageActivity_stringFromJNI(
+        JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_example_opencv2_MainActivity_myFlip(JNIEnv* env, jobject, jobject bitmapIn, jobject bitmapOut) {
+Java_com_example_PhotoFocus_EditImageActivity_flip(JNIEnv *env, jobject p_this, jobject bitmapIn, jobject bitmapOut) {
     Mat src;
     bitmapToMat(env, bitmapIn, src, false);
+    // NOTE bitmapToMat returns Mat in RGBA format, if needed convert to BGRA using cvtColor
+
     myFlip(src);
+
+    // NOTE matToBitmap expects Mat in GRAY/RGB(A) format, if needed convert using cvtColor
     matToBitmap(env, src, bitmapOut, false);
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_opencv2_MainActivity_myBlur(JNIEnv* env, jobject, jobject bitmapIn, jobject bitmapOut, jfloat sigma) {
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myBlur(JNIEnv *env, jobject, jobject bitmap_in,
+                                                   jobject bitmap_out, jfloat sigma) {
     Mat src;
-    bitmapToMat(env, bitmapIn, src, false);
+    bitmapToMat(env, bitmap_in, src, false);
     myBlur(src, sigma);
-    matToBitmap(env, src, bitmapOut, false);
+    matToBitmap(env, src, bitmap_out, false);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myNoise(JNIEnv *env, jobject, jobject bitmap_in,
+                                                     jobject bitmap_out, jfloat sigma) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    myNoise(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
 }
