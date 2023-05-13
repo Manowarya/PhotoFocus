@@ -35,6 +35,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private var saturationSeekBar: SeekBar? = null
     private var brightSeekBar: SeekBar? = null
     private var expositionSeekBar: SeekBar? = null
+    private var contrastSeekBar: SeekBar? = null
     private var blurSeekBar: SeekBar? = null
     private var noiseSeekBar: SeekBar? = null
 
@@ -173,6 +174,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         saturationSeekBar = findViewById(R.id.saturationSeekBar)
         brightSeekBar = findViewById(R.id.brightSeekBar)
         expositionSeekBar = findViewById(R.id.expositionSeekBar)
+        contrastSeekBar = findViewById(R.id.contrastSeekBar)
         noiseSeekBar = findViewById(R.id.noiseSeekBar)
         blurSeekBar = findViewById(R.id.blurSeekBar)
 
@@ -182,6 +184,9 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         expositionSeekBar!!.setOnSeekBarChangeListener(this)
         expositionSeekBar!!.setMax(20)
         expositionSeekBar!!.setProgress(10)
+        contrastSeekBar!!.setOnSeekBarChangeListener(this)
+        contrastSeekBar!!.setMax(20)
+        contrastSeekBar!!.setProgress(10)
         blurSeekBar!!.setOnSeekBarChangeListener(this)
         noiseSeekBar!!.setOnSeekBarChangeListener(this)
 
@@ -230,6 +235,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     external fun myNoise(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun myTone(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun myExposition(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    external fun myContrast(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun myBright(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun mySaturation(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
 
@@ -237,6 +243,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private var saturation: Float = 1.0F
     private var bright: Float = 0.0F
     private var exposition: Float = 0.0F
+    private var contrast: Float = 0.0F
     private var blur: Float = 0.0F
     private var noise: Float = 0.0F
     fun applyEffects() {
@@ -245,11 +252,13 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         saturation = max(1.0F, saturationSeekBar!!.progress / 10F)
         bright = max(0.1F, brightSeekBar!!.progress / 10F)
         exposition = max(0.1F, expositionSeekBar!!.progress / 10F)
+        contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
         blur = max(0.1F, blurSeekBar!!.progress / 10F)
         noise =  max(0.1F, noiseSeekBar!!.progress / 10F)
         myBright(tempBitmap, tempBitmap, bright)
         mySaturation(tempBitmap, tempBitmap, saturation)
         myExposition(tempBitmap, tempBitmap, exposition)
+        myContrast(tempBitmap, tempBitmap, contrast)
         myBlur(tempBitmap, tempBitmap, blur)
         myNoise(tempBitmap, tempBitmap, noise)
         myTone(tempBitmap, tempBitmap, tone)

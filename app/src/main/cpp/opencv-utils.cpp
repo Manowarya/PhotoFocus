@@ -71,13 +71,17 @@ void myBright(Mat image, float sigma) {
     convertScaleAbs(dst, image);
 }
 
-void myExposition(Mat& image, float exposure_factor) {
-    Mat lookup_table(1, 256, CV_8U); // Создаем таблицу преобразования для изменения яркости
+void myExposition(Mat& image, float sigma) {
+    Mat lookup_table(1, 256, CV_8U);
 
     for (int i = 0; i < 256; i++) {
-        int adjusted_value = saturate_cast<uchar>(i * exposure_factor);
+        int adjusted_value = saturate_cast<uchar>(i * sigma);
         lookup_table.at<uchar>(i) = adjusted_value;
     }
 
-    LUT(image, lookup_table, image); // Применяем таблицу преобразования к изображению
+    LUT(image, lookup_table, image);
+}
+
+void myContrast(Mat& image, float sigma) {
+    image.convertTo(image, -1, sigma, 0);
 }
