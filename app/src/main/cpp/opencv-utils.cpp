@@ -49,6 +49,19 @@ void myTone(Mat& image, float sigma)
     cvtColor(image, image, COLOR_HSV2BGR);
 }
 
+void mySaturation(Mat& image, float sigma) {
+    cvtColor(image, image, COLOR_BGR2HSV);
+
+    std::vector<Mat> channels;
+    split(image, channels);
+
+    channels[1] *= sigma;
+
+    merge(channels, image);
+
+    cvtColor(image, image, COLOR_HSV2BGR);
+}
+
 
 void myBright(Mat image, float sigma) {
     Mat dst;

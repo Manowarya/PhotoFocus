@@ -128,10 +128,20 @@ Java_com_example_PhotoFocus_EditImageActivity_myNoise(JNIEnv *env, jobject, jobj
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_PhotoFocus_EditImageActivity_myTone(JNIEnv *env, jobject, jobject bitmap_in,
-                                                       jobject bitmap_out, jfloat sigma) {
+                                                     jobject bitmap_out, jfloat sigma) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
     myTone(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_mySaturation(JNIEnv *env, jobject, jobject bitmap_in,
+                                                       jobject bitmap_out, jfloat sigma) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    mySaturation(src, sigma);
     matToBitmap(env, src, bitmap_out, false);
 }
 

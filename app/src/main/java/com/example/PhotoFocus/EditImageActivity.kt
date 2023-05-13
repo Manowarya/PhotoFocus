@@ -32,6 +32,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private var selectedLinearLayout: LinearLayout? = null
 
     private var toneSeekBar: SeekBar? = null
+    private var saturationSeekBar: SeekBar? = null
     private var brightSeekBar: SeekBar? = null
     private var blurSeekBar: SeekBar? = null
     private var noiseSeekBar: SeekBar? = null
@@ -167,14 +168,16 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         val vignette = findViewById<TextView>(R.id.vignette)
 
         toneSeekBar = findViewById(R.id.toneSeekBar)
+        saturationSeekBar = findViewById(R.id.saturationSeekBar)
         brightSeekBar = findViewById(R.id.brightSeekBar)
         noiseSeekBar = findViewById(R.id.noiseSeekBar)
         blurSeekBar = findViewById(R.id.blurSeekBar)
 
+        brightSeekBar!!.setOnSeekBarChangeListener(this)
+        saturationSeekBar!!.setOnSeekBarChangeListener(this)
         toneSeekBar!!.setOnSeekBarChangeListener(this)
         blurSeekBar!!.setOnSeekBarChangeListener(this)
         noiseSeekBar!!.setOnSeekBarChangeListener(this)
-        brightSeekBar!!.setOnSeekBarChangeListener(this)
 
         selectedLinearLayout = colorLinearLayout
         handleTextViewClick(color)
@@ -221,18 +224,22 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     external fun myNoise(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun myTone(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun myBright(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    external fun mySaturation(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
 
     private var tone: Float = 0.0F
+    private var saturation: Float = 0.0F
     private var bright: Float = 0.0F
     private var blur: Float = 0.0F
     private var noise: Float = 0.0F
     fun applyEffects() {
         val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
         tone = max(0.1F, toneSeekBar!!.progress / 10F)
+        saturation = max(0.1F, saturationSeekBar!!.progress / 10F)
         bright = max(0.1F, brightSeekBar!!.progress / 10F)
         blur = max(0.1F, blurSeekBar!!.progress / 10F)
         noise =  max(0.1F, noiseSeekBar!!.progress / 10F)
         myBright(tempBitmap, tempBitmap, bright)
+        mySaturation(tempBitmap, tempBitmap, saturation)
         myBlur(tempBitmap, tempBitmap, blur)
         myNoise(tempBitmap, tempBitmap, noise)
         myTone(tempBitmap, tempBitmap, tone)
