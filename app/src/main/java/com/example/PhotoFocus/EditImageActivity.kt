@@ -1,6 +1,6 @@
 package com.example.PhotoFocus
 
-import android.graphics.Bitmap
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
@@ -13,7 +13,6 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.drawable.toBitmap
 import com.example.PhotoFocus.databinding.EditImageBinding
 import java.lang.Float.max
 import kotlin.concurrent.thread
@@ -32,7 +31,10 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private var selectedTextView: TextView? = null
     private var selectedLinearLayout: LinearLayout? = null
 
+    private var brightSeekBar: SeekBar? = null
     private var blurSeekBar: SeekBar? = null
+    private var noiseSeekBar: SeekBar? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         editImageBinding = EditImageBinding.inflate(layoutInflater)
@@ -163,17 +165,13 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         val blur = findViewById<TextView>(R.id.blur)
         val vignette = findViewById<TextView>(R.id.vignette)
 
-        val toneSeekBar = findViewById<SeekBar>(R.id.toneSeekBar)
-        val saturationSeekBar = findViewById<SeekBar>(R.id.saturationSeekBar)
-        val brightSeekBar = findViewById<SeekBar>(R.id.brightSeekBar)
-        val expositionSeekBar = findViewById<SeekBar>(R.id.expositionSeekBar)
-        val contrastSeekBar = findViewById<SeekBar>(R.id.contrastSeekBar)
-        val noiseSeekBar = findViewById<SeekBar>(R.id.noiseSeekBar)
+        brightSeekBar = findViewById(R.id.brightSeekBar)
+        noiseSeekBar = findViewById(R.id.noiseSeekBar)
         blurSeekBar = findViewById(R.id.blurSeekBar)
-        val vignetteSeekBar = findViewById<SeekBar>(R.id.vignetteSeekBar)
 
         blurSeekBar!!.setOnSeekBarChangeListener(this)
-        noiseSeekBar.setOnSeekBarChangeListener(this)
+        noiseSeekBar!!.setOnSeekBarChangeListener(this)
+        brightSeekBar!!.setOnSeekBarChangeListener(this)
 
         selectedLinearLayout = colorLinearLayout
         handleTextViewClick(color)
@@ -181,10 +179,12 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         color.setOnClickListener{
             handleTextViewClick(color)
             linearLayoutVisible(colorLinearLayout)
+
         }
         light.setOnClickListener{
             handleTextViewClick(light)
             linearLayoutVisible(lightLinearLayout)
+
         }
         noise.setOnClickListener {
             handleTextViewClick(noise)
@@ -194,7 +194,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
             handleTextViewClick(blur)
             linearLayoutVisible(blurLinearLayout)
 
-            dstBitmap = bitmap!!.copy(bitmap!!.config, true)
         }
         vignette.setOnClickListener{
             handleTextViewClick(vignette)
@@ -217,27 +216,25 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
 
     external fun myBlur(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-
     external fun myNoise(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    fun doBlur() {
-        val sigma = max(0.1F, blurSeekBar!!.progress / 10F)
+    external fun myBright(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
 
-        this.myBlur(bitmap!!, dstBitmap!!, sigma)
+    private var brightness: Float = 0.0F
+    private var blur: Float = 0.0F
+    private var noise: Float = 0.0F
+    fun applyEffects() {
+        val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
+        brightness = max(0.1F, brightSeekBar!!.progress / 10F)
+        blur = max(0.1F, blurSeekBar!!.progress / 10F)
+        noise =  max(0.1F, noiseSeekBar!!.progress / 10F)
+        myBright(tempBitmap, tempBitmap, brightness)
+        myBlur(tempBitmap, tempBitmap, blur)
+        myNoise(tempBitmap, tempBitmap, noise)
+
+        dstBitmap = tempBitmap
 
         editImageBinding.imagePreview.setImageBitmap(dstBitmap)
     }
-
-    fun doNoise(progress: Int) {
-        this.doBlur()
-        val sigma = max(0.1F, progress / 10F)
-        val drawable = editImageBinding.imagePreview.drawable
-        val srcBitmap = drawable.toBitmap()
-
-        this.myNoise(srcBitmap, dstBitmap!!, sigma)
-
-        editImageBinding.imagePreview.setImageBitmap(dstBitmap)
-    }
-
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
     }
     override fun onStartTrackingTouch(p0: SeekBar?) {}
@@ -246,12 +243,17 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         when (p0!!.getId()) {
             R.id.blurSeekBar -> {
                 thread {
-                    doBlur()
+                    applyEffects()
                 }
             }
             R.id.noiseSeekBar -> {
                 thread {
-                    doNoise(p0.progress)
+                    applyEffects()
+                }
+            }
+            R.id.brightSeekBar -> {
+                thread {
+                   applyEffects()
                 }
             }
         }

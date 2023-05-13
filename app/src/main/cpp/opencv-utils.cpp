@@ -8,47 +8,29 @@ void myFlip(Mat src) {
 void myBlur(Mat src, float sigma) {
     GaussianBlur(src, src, Size(), sigma);
 }
-void colorGrainEffectThread(Mat& image, int start_row, int end_row, float grain_ratio) {
-    int cols = image.cols;
-
-    srand(time(NULL)); // инициализация генератора случайных чисел
-
-    Mat gray_image;
-    cvtColor(image, gray_image, COLOR_BGR2GRAY); // преобразуем изображение в grayscale
-
-    for (int row = start_row; row < end_row; row++) {
-        for (int col = 0; col < cols; col++) {
-            if ((float) rand() / RAND_MAX < grain_ratio) { // проверяем, нужно ли зернистить этот пиксель
-                int noise_value = rand() % 256; // случайное значение шума
-                gray_image.at<uchar>(row, col) = noise_value;
-            }
-        }
-    }
-
-    cvtColor(gray_image, image, COLOR_GRAY2BGR); // преобразуем изображение обратно в цветное
-}
-
 void myNoise(Mat image, float sigma) {
-    /*Mat noise(src.size(),src.type());
-    cv::randn(noise, 12, sigma*10); //mean and variance
-    src += noise;*/
+    std::vector<Mat> channels;
+    split(image, channels);
 
-    std::vector<cv::Mat> channels;
-    cv::split(image, channels);
+    for (Mat& channel : channels) {
+        Mat noise(channel.size(), CV_32F);
+        randn(noise, 0.0, sigma*3);
 
-    for (cv::Mat& channel : channels) {
-        cv::Mat noise(channel.size(), CV_32F);
-        cv::randn(noise, 0.0, sigma);
+        Mat blurred;
+        GaussianBlur(noise, blurred, Size(5, 5), 0);
 
-        cv::Mat blurred;
-        cv::GaussianBlur(noise, blurred, cv::Size(5, 5), 0);
+        Mat result;
+        add(channel, blurred, result, Mat(), CV_8U);
 
-        cv::Mat result;
-        cv::addWeighted(channel, 1.0, blurred, 1.0, 0.0, result, channel.type());
-
-        cv::normalize(result, result, 0, 255, cv::NORM_MINMAX, CV_8U);
         channel = result;
     }
+    merge(channels, image);
+}
 
-    cv::merge(channels, image);
+void myBright(Mat image, float sigma) {
+    Mat dst;
+    float alpha = 1.0f, beta = sigma*3;
+
+    image.convertTo(dst, -1, alpha,beta);
+    convertScaleAbs(dst, image);
 }
