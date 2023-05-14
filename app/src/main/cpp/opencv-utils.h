@@ -12,4 +12,5 @@ void myExposition(Mat& image, float sigma);
 void myContrast(Mat& image, float sigma);
 void myBlur(Mat image, float sigma);
 void myNoise(Mat image, float sigma);
+void myVignette(Mat& image, float sigma);
 

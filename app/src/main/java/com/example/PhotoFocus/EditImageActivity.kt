@@ -38,7 +38,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private var contrastSeekBar: SeekBar? = null
     private var blurSeekBar: SeekBar? = null
     private var noiseSeekBar: SeekBar? = null
-
+    private var vignetteSeekBar: SeekBar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +65,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
 
         editImageBinding.correctionBtn.setOnClickListener {
             toolsLayout.visibility=View.GONE
-            correction()
+            correction(toolsLayout)
         }
     }
 
@@ -156,13 +156,15 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         }
     }
 
-    private fun correction() {
+    private fun correction(toolsLayout: HorizontalScrollView) {
         val correctionTools = findViewById<ConstraintLayout>(R.id.correctionBtnsLayout)
         val colorLinearLayout = findViewById<LinearLayout>(R.id.colorLinearLayout)
         val lightLinearLayout = findViewById<LinearLayout>(R.id.lightLinearLayout)
         val blurLinearLayout = findViewById<LinearLayout>(R.id.blurLinearLayout)
         val noiseLinearLayout = findViewById<LinearLayout>(R.id.noiseLinearLayout)
         val vignetteLinearLayout = findViewById<LinearLayout>(R.id.vignetteLinearLayout)
+        val backBtn = findViewById<Button>(R.id.backBtn)
+        val saveBtn = findViewById<Button>(R.id.saveBtn)
 
         val color = findViewById<TextView>(R.id.color)
         val light = findViewById<TextView>(R.id.light)
@@ -170,13 +172,22 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         val blur = findViewById<TextView>(R.id.blur)
         val vignette = findViewById<TextView>(R.id.vignette)
 
-        toneSeekBar = findViewById(R.id.toneSeekBar)
-        saturationSeekBar = findViewById(R.id.saturationSeekBar)
-        brightSeekBar = findViewById(R.id.brightSeekBar)
-        expositionSeekBar = findViewById(R.id.expositionSeekBar)
-        contrastSeekBar = findViewById(R.id.contrastSeekBar)
-        noiseSeekBar = findViewById(R.id.noiseSeekBar)
-        blurSeekBar = findViewById(R.id.blurSeekBar)
+        if (toneSeekBar == null)
+            toneSeekBar = findViewById(R.id.toneSeekBar)
+        if (saturationSeekBar == null)
+            saturationSeekBar = findViewById(R.id.saturationSeekBar)
+        if (brightSeekBar == null)
+            brightSeekBar = findViewById(R.id.brightSeekBar)
+        if (expositionSeekBar == null)
+            expositionSeekBar = findViewById(R.id.expositionSeekBar)
+        if (contrastSeekBar == null)
+            contrastSeekBar = findViewById(R.id.contrastSeekBar)
+        if (noiseSeekBar == null)
+            noiseSeekBar = findViewById(R.id.noiseSeekBar)
+        if (blurSeekBar == null)
+            blurSeekBar = findViewById(R.id.blurSeekBar)
+        if (vignetteSeekBar == null)
+            vignetteSeekBar = findViewById(R.id.vignetteSeekBar)
 
         brightSeekBar!!.setOnSeekBarChangeListener(this)
         saturationSeekBar!!.setOnSeekBarChangeListener(this)
@@ -187,6 +198,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         contrastSeekBar!!.setOnSeekBarChangeListener(this)
         contrastSeekBar!!.setMax(20)
         contrastSeekBar!!.setProgress(10)
+        vignetteSeekBar!!.setOnSeekBarChangeListener(this)
+        vignetteSeekBar!!.setMax(10)
         blurSeekBar!!.setOnSeekBarChangeListener(this)
         noiseSeekBar!!.setOnSeekBarChangeListener(this)
 
@@ -219,6 +232,13 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
 
         correctionTools.visibility = View.VISIBLE
 
+        backBtn.setOnClickListener{
+            handleTextViewClick(color)
+            linearLayoutVisible(colorLinearLayout)
+            saveBtn.visibility = View.VISIBLE
+            toolsLayout.visibility=View.VISIBLE
+            correctionTools.visibility = View.GONE
+        }
     }
     private fun handleTextViewClick(textView: TextView) {
         selectedTextView?.setTextColor(resources.getColor(R.color.white))
@@ -238,6 +258,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     external fun myContrast(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun myBright(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     external fun mySaturation(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    external fun myVignette(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
 
     private var tone: Float = 0.0F
     private var saturation: Float = 1.0F
@@ -246,6 +267,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private var contrast: Float = 0.0F
     private var blur: Float = 0.0F
     private var noise: Float = 0.0F
+    private var vignette: Float = 0.0F
     fun applyEffects() {
         val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
         tone = max(0.1F, toneSeekBar!!.progress / 10F)
@@ -255,6 +277,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
         blur = max(0.1F, blurSeekBar!!.progress / 10F)
         noise =  max(0.1F, noiseSeekBar!!.progress / 10F)
+        vignette =  max(0.1F, vignetteSeekBar!!.progress / 10F)
         myBright(tempBitmap, tempBitmap, bright)
         mySaturation(tempBitmap, tempBitmap, saturation)
         myExposition(tempBitmap, tempBitmap, exposition)
@@ -262,6 +285,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         myBlur(tempBitmap, tempBitmap, blur)
         myNoise(tempBitmap, tempBitmap, noise)
         myTone(tempBitmap, tempBitmap, tone)
+        myVignette(tempBitmap, tempBitmap, vignette)
 
         dstBitmap = tempBitmap
 

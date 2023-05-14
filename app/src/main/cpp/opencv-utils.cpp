@@ -85,3 +85,33 @@ void myExposition(Mat& image, float sigma) {
 void myContrast(Mat& image, float sigma) {
     image.convertTo(image, -1, sigma, 0);
 }
+
+void myVignette(Mat& image, float sigma)
+{
+    cvtColor(image, image, COLOR_BGR2HSV);
+
+    int width = image.cols;
+    int height = image.rows;
+
+    int centerX = width / 2;
+    int centerY = height / 2;
+
+    double maxDistance = norm(Point(centerX, centerY));
+
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            double distance = norm(cv::Point(x - centerX, y - centerY));
+            double vignette = 1.0 - sigma * distance / maxDistance;
+
+            vignette = std::max(vignette, 0.0);
+
+            image.at<Vec3b>(y, x)[2] *= vignette;
+
+            image.at<Vec3b>(y, x)[1] *= vignette;
+        }
+    }
+
+    cvtColor(image, image, COLOR_HSV2BGR);
+}
