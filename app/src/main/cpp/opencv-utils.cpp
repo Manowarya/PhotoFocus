@@ -5,8 +5,17 @@
 void myFlip(Mat image) {
     flip(image, image, 0);
 }
-void myBlur(Mat image, float sigma) {
-    GaussianBlur(image, image, Size(), sigma);
+void myBlur(Mat& image, float sigma) {
+    Mat blurredImage;
+    GaussianBlur(image, blurredImage, Size(0, 0), sigma);
+
+    Mat bokehImage;
+    subtract(image, blurredImage, bokehImage);
+
+    threshold(bokehImage, bokehImage, 0, 255, THRESH_TOZERO);
+
+    add(blurredImage, bokehImage, image);
+
 }
 void myNoise(Mat image, float sigma) {
     std::vector<Mat> channels;
@@ -96,44 +105,6 @@ void myContrast(Mat& image, float sigma) {
     image.convertTo(image, -1, contrast, 0);
 }
 
-/*void myVignette(Mat& image, float sigma)
-{
-    cvtColor(image, image, COLOR_BGR2HSV);
-
-    int width = image.cols;
-    int height = image.rows;
-
-    int centerX = width / 2;
-    int centerY = height / 2;
-
-    double maxDistance = norm(Point(centerX, centerY));
-
-    float vignetteIntensity = std::abs(sigma) / 10.0; // Нормализуем sigma в диапазоне [0, 1]
-
-    for (int y = 0; y < height; ++y)
-    {
-        for (int x = 0; x < width; ++x)
-        {
-            double distance = norm(cv::Point(x - centerX, y - centerY));
-            double vignette = vignetteIntensity * distance / maxDistance;
-
-            vignette = std::min(vignette, 1.0);
-
-            if (sigma < 0)
-            {
-                // Черный ореол
-                image.at<Vec3b>(y, x)[2] = static_cast<uchar>(image.at<Vec3b>(y, x)[2] * (1.0 - vignette));
-            }
-            else if (sigma > 0)
-            {
-                // Белый ореол
-                image.at<Vec3b>(y, x)[2] = static_cast<uchar>(255 - (255 - image.at<Vec3b>(y, x)[2]) * vignette);
-            }
-        }
-    }
-
-    cvtColor(image, image, COLOR_HSV2BGR);
-}*/
 void myVignette(Mat& image, float sigma) {
     cvtColor(image, image, COLOR_BGR2HSV);
 

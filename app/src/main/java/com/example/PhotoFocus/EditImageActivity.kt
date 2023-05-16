@@ -327,7 +327,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         bright = max(0.1F, brightSeekBar!!.progress / 10F)
         exposition = max(0.1F, expositionSeekBar!!.progress / 10F)
         contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
-        blur = max(0.1F, blurSeekBar!!.progress / 10F)
+        blur = max(0.1F, blurSeekBar!!.progress / 1F)
         noise =  max(0.1F, noiseSeekBar!!.progress / 10F)
         vignette =  max(0.1F, vignetteSeekBar!!.progress / 10F)
 
@@ -341,6 +341,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         myVignette(tempBitmap, tempBitmap, vignette)
 
         dstBitmap = tempBitmap
+
 
         editImageBinding.imagePreview.setImageBitmap(dstBitmap)
     }
