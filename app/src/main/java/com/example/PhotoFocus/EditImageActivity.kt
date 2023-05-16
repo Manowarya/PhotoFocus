@@ -4,8 +4,11 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -17,7 +20,7 @@ import com.example.PhotoFocus.databinding.EditImageBinding
 import java.lang.Float.max
 import kotlin.concurrent.thread
 
-class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
+class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, TextWatcher {
     companion object {
         init {
             System.loadLibrary("native-lib")
@@ -39,6 +42,16 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private var blurSeekBar: SeekBar? = null
     private var noiseSeekBar: SeekBar? = null
     private var vignetteSeekBar: SeekBar? = null
+
+    private var editTextTone: EditText? = null
+    private var editTextSaturation: EditText? = null
+    private var editTextBright: EditText? = null
+    private var editTextExposition: EditText? = null
+    private var editTextContrast: EditText? = null
+    private var editTextBlur: EditText? = null
+    private var editTextNoise: EditText? = null
+    private var editTextVignette: EditText? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -172,6 +185,24 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         val blur = findViewById<TextView>(R.id.blur)
         val vignette = findViewById<TextView>(R.id.vignette)
 
+        editTextTone = findViewById(R.id.editTextTone)
+        editTextSaturation = findViewById(R.id.editTextSaturation)
+        editTextBright = findViewById(R.id.editTextBright)
+        editTextExposition = findViewById(R.id.editTextExposition)
+        editTextContrast = findViewById(R.id.editTextContrast)
+        editTextBlur = findViewById(R.id.editTextBlur)
+        editTextNoise = findViewById(R.id.editTextNoise)
+        editTextVignette = findViewById(R.id.editTextVignette)
+
+        editTextTone!!.addTextChangedListener(this)
+        editTextSaturation!!.addTextChangedListener(this)
+        editTextBright!!.addTextChangedListener(this)
+        editTextExposition!!.addTextChangedListener(this)
+        editTextContrast!!.addTextChangedListener(this)
+        editTextBlur!!.addTextChangedListener(this)
+        editTextNoise!!.addTextChangedListener(this)
+        editTextVignette!!.addTextChangedListener(this)
+
         if (toneSeekBar == null)
             toneSeekBar = findViewById(R.id.toneSeekBar)
         if (saturationSeekBar == null)
@@ -189,19 +220,37 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         if (vignetteSeekBar == null)
             vignetteSeekBar = findViewById(R.id.vignetteSeekBar)
 
-        brightSeekBar!!.setOnSeekBarChangeListener(this)
-        saturationSeekBar!!.setOnSeekBarChangeListener(this)
         toneSeekBar!!.setOnSeekBarChangeListener(this)
+        toneSeekBar!!.max = 200
+        toneSeekBar!!.progress = 100
+
+        saturationSeekBar!!.setOnSeekBarChangeListener(this)
+        saturationSeekBar!!.max = 200
+        saturationSeekBar!!.progress = 100
+
+        brightSeekBar!!.setOnSeekBarChangeListener(this)
+        brightSeekBar!!.max = 200
+        brightSeekBar!!.progress = 100
+
         expositionSeekBar!!.setOnSeekBarChangeListener(this)
-        expositionSeekBar!!.setMax(20)
-        expositionSeekBar!!.setProgress(10)
+        expositionSeekBar!!.max = 200
+        expositionSeekBar!!.progress = 100
+
         contrastSeekBar!!.setOnSeekBarChangeListener(this)
-        contrastSeekBar!!.setMax(20)
-        contrastSeekBar!!.setProgress(10)
-        vignetteSeekBar!!.setOnSeekBarChangeListener(this)
-        vignetteSeekBar!!.setMax(10)
+        contrastSeekBar!!.max = 200
+        contrastSeekBar!!.progress = 100
+
         blurSeekBar!!.setOnSeekBarChangeListener(this)
+        blurSeekBar!!.max = 100
+        blurSeekBar!!.progress = 0
+
         noiseSeekBar!!.setOnSeekBarChangeListener(this)
+        noiseSeekBar!!.max = 100
+        noiseSeekBar!!.progress = 0
+
+        vignetteSeekBar!!.setOnSeekBarChangeListener(this)
+        vignetteSeekBar!!.max = 100
+        vignetteSeekBar!!.progress = 0
 
         selectedLinearLayout = colorLinearLayout
         handleTextViewClick(color)
@@ -209,6 +258,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         color.setOnClickListener{
             handleTextViewClick(color)
             linearLayoutVisible(colorLinearLayout)
+            editTextTone!!.setText("0")
 
         }
         light.setOnClickListener{
@@ -251,14 +301,14 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         selectedLinearLayout = linearLayout
     }
 
-    external fun myBlur(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    external fun myNoise(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    external fun myTone(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    external fun myExposition(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    external fun myContrast(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    external fun myBright(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    external fun mySaturation(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    external fun myVignette(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    private external fun myBlur(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    private external fun myNoise(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    private external fun myTone(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    private external fun myExposition(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    private external fun myContrast(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    private external fun myBright(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    private external fun mySaturation(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    private external fun myVignette(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
 
     private var tone: Float = 0.0F
     private var saturation: Float = 1.0F
@@ -268,9 +318,11 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     private var blur: Float = 0.0F
     private var noise: Float = 0.0F
     private var vignette: Float = 0.0F
-    fun applyEffects() {
+
+    private fun applyEffects() {
         val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
         tone = max(0.1F, toneSeekBar!!.progress / 10F)
+
         saturation = max(1.0F, saturationSeekBar!!.progress / 10F)
         bright = max(0.1F, brightSeekBar!!.progress / 10F)
         exposition = max(0.1F, expositionSeekBar!!.progress / 10F)
@@ -278,13 +330,14 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         blur = max(0.1F, blurSeekBar!!.progress / 10F)
         noise =  max(0.1F, noiseSeekBar!!.progress / 10F)
         vignette =  max(0.1F, vignetteSeekBar!!.progress / 10F)
-        myBright(tempBitmap, tempBitmap, bright)
-        mySaturation(tempBitmap, tempBitmap, saturation)
-        myExposition(tempBitmap, tempBitmap, exposition)
-        myContrast(tempBitmap, tempBitmap, contrast)
+
+        myTone(tempBitmap, tempBitmap, tone - 10F)
+        mySaturation(tempBitmap, tempBitmap, saturation - 10F)
+        myBright(tempBitmap, tempBitmap, bright - 10F)
+        myExposition(tempBitmap, tempBitmap, exposition - 10F)
+        myContrast(tempBitmap, tempBitmap, contrast - 10F)
         myBlur(tempBitmap, tempBitmap, blur)
         myNoise(tempBitmap, tempBitmap, noise)
-        myTone(tempBitmap, tempBitmap, tone)
         myVignette(tempBitmap, tempBitmap, vignette)
 
         dstBitmap = tempBitmap
@@ -296,8 +349,46 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     override fun onStartTrackingTouch(p0: SeekBar?) {}
 
     override fun onStopTrackingTouch(p0: SeekBar?) {
+
+        when (p0) {
+            toneSeekBar -> editTextTone!!.setText((p0!!.progress - 100).toString())
+            saturationSeekBar -> editTextSaturation!!.setText((p0!!.progress - 100).toString())
+            brightSeekBar -> editTextBright!!.setText((p0!!.progress - 100).toString())
+            expositionSeekBar -> editTextExposition!!.setText((p0!!.progress - 100).toString())
+            contrastSeekBar -> editTextContrast!!.setText((p0!!.progress - 100).toString())
+            blurSeekBar -> editTextBlur!!.setText((p0!!.progress).toString())
+            noiseSeekBar -> editTextNoise!!.setText((p0!!.progress).toString())
+            vignetteSeekBar -> editTextVignette!!.setText((p0!!.progress).toString())
+        }
         thread {
             applyEffects()
+        }
+    }
+
+    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+    }
+
+    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+    }
+
+    override fun afterTextChanged(p0: Editable?) {
+        p0?.let {
+            val value = p0.toString().toIntOrNull() ?: 0
+            when (p0) {
+                editTextTone!!.text -> toneSeekBar!!.progress = value + 100
+                editTextSaturation!!.text -> saturationSeekBar!!.progress = value + 100
+                editTextBright!!.text -> brightSeekBar!!.progress = value + 100
+                editTextExposition!!.text -> expositionSeekBar!!.progress = value + 100
+                editTextContrast!!.text -> contrastSeekBar!!.progress = value + 100
+                editTextBlur!!.text -> blurSeekBar!!.progress = value
+                editTextNoise!!.text -> noiseSeekBar!!.progress = value
+                editTextVignette!!.text -> vignetteSeekBar!!.progress = value
+            }
+            thread {
+                applyEffects()
+            }
         }
     }
 }

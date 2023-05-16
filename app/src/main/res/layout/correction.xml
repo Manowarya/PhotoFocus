@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/correctionBtnsLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/correctionBtnsLayout"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/background"
     android:visibility="gone"
-    >
+>
 
     <HorizontalScrollView
+        android:id="@+id/correctionMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/correctionMenu"
-        android:gravity="center"
         android:layout_marginStart="@dimen/_20sdp"
-        android:layout_marginBottom="@dimen/_100sdp"
+        android:layout_marginBottom="@dimen/_120sdp"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        >
+
         <LinearLayout
             android:id="@+id/correctionLayout"
             android:layout_width="wrap_content"
@@ -27,7 +29,8 @@
             android:paddingHorizontal="@dimen/_1sdp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            >
 
             <TextView
                 android:id="@+id/color"
@@ -55,6 +58,7 @@
                 android:text="@string/blur"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_14sdp" />
+
             <TextView
                 android:id="@+id/noise"
                 android:layout_width="wrap_content"
@@ -63,6 +67,7 @@
                 android:text="@string/noise"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_14sdp" />
+
             <TextView
                 android:id="@+id/vignette"
                 android:layout_width="wrap_content"
@@ -75,202 +80,359 @@
     </HorizontalScrollView>
 
     <LinearLayout
+        android:id="@+id/colorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/colorLinearLayout"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:gravity="center"
         android:layout_marginStart="@dimen/_20sdp"
         android:layout_marginEnd="@dimen/_20sdp"
-        app:layout_constraintTop_toBottomOf="@+id/correctionMenu"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/correctionMenu">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_5sdp"
-            android:text="@string/tone"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            />
+            android:layout_height="28dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tone"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_12sdp" />
+
+            <EditText
+                android:id="@+id/editTextTone"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_marginStart="@dimen/_180sdp"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
+                android:text="@string/_0"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:importantForAutofill="no" />
+        </LinearLayout>
+
         <SeekBar
             android:id="@+id/toneSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="@dimen/_12sdp">
 
         </SeekBar>
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_5sdp"
-            android:text="@string/saturation"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            app:layout_constraintBottom_toTopOf="@+id/saturation" />
+            android:layout_height="28dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/saturation"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_12sdp" />
+
+            <EditText
+                android:id="@+id/editTextSaturation"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_marginStart="@dimen/_140sdp"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
+                android:text="@string/_0"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:importantForAutofill="no" />
+        </LinearLayout>
+
         <SeekBar
             android:id="@+id/saturationSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/_12sdp"
             app:layout_constraintTop_toBottomOf="@+id/tone">
+
         </SeekBar>
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_5sdp"
-            android:text="@string/bright"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            app:layout_constraintBottom_toTopOf="@+id/bright" />
+            android:layout_height="28dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bright"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_12sdp"
+                app:layout_constraintBottom_toTopOf="@+id/bright" />
+
+            <EditText
+                android:id="@+id/editTextBright"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_marginStart="@dimen/_180sdp"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
+                android:text="@string/_0"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:importantForAutofill="no" />
+        </LinearLayout>
+
         <SeekBar
             android:id="@+id/brightSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/_12sdp"
             app:layout_constraintTop_toBottomOf="@+id/saturation">
+
         </SeekBar>
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/lightLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/lightLinearLayout"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:layout_marginEnd="@dimen/_20sdp"
+        android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:gravity="center"
-        android:layout_marginStart="@dimen/_20sdp"
-        android:layout_marginEnd="@dimen/_20sdp"
         app:layout_constraintTop_toBottomOf="@+id/correctionMenu"
-        android:orientation="vertical"
         android:visibility="gone">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_5sdp"
-            android:text="@string/exposition"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            app:layout_constraintBottom_toTopOf="@+id/exposition" />
+            android:layout_height="28dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:text="@string/exposition"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_12sdp"
+                app:layout_constraintBottom_toTopOf="@+id/exposition" />
+
+            <EditText
+                android:id="@+id/editTextExposition"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_marginStart="@dimen/_150sdp"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
+                android:text="@string/_0"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:importantForAutofill="no" />
+        </LinearLayout>
 
         <SeekBar
             android:id="@+id/expositionSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/_12sdp"
             app:layout_constraintTop_toBottomOf="@+id/correctionMenu">
+
         </SeekBar>
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_5sdp"
-            android:text="@string/contrast"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            app:layout_constraintBottom_toTopOf="@+id/contrast" />
+            android:layout_height="28dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:text="@string/contrast"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_12sdp"
+                app:layout_constraintBottom_toTopOf="@+id/contrast" />
+
+            <EditText
+                android:id="@+id/editTextContrast"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_marginStart="@dimen/_135sdp"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
+                android:text="@string/_0"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:importantForAutofill="no"  />
+        </LinearLayout>
+
         <SeekBar
             android:id="@+id/contrastSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/_12sdp"
             app:layout_constraintTop_toBottomOf="@+id/exposition">
+
         </SeekBar>
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/blurLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/blurLinearLayout"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:layout_marginEnd="@dimen/_20sdp"
+        android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:gravity="center"
-        android:layout_marginStart="@dimen/_20sdp"
-        android:layout_marginEnd="@dimen/_20sdp"
         app:layout_constraintTop_toBottomOf="@+id/correctionMenu"
-        android:orientation="vertical"
         android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:orientation="horizontal">
+
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/blur"
             android:layout_marginStart="@dimen/_5sdp"
+            android:text="@string/blur"
             android:textColor="@color/white"
             android:textSize="@dimen/_12sdp"
             app:layout_constraintBottom_toTopOf="@+id/blurSeekBar"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/editTextBlur"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_135sdp"
+            android:inputType="numberDecimal|numberSigned"
+            android:maxLines="1"
+            android:text="@string/_0"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_10sdp"
+            android:importantForAutofill="no"  />
+    </LinearLayout>
         <SeekBar
             android:id="@+id/blurSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/correctionMenu"
-            >
+            android:layout_height="@dimen/_12sdp"
+            app:layout_constraintTop_toBottomOf="@+id/correctionMenu">
+
         </SeekBar>
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/noiseLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/noiseLinearLayout"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:layout_marginEnd="@dimen/_20sdp"
+        android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:gravity="center"
-        android:layout_marginStart="@dimen/_20sdp"
-        android:layout_marginEnd="@dimen/_20sdp"
         app:layout_constraintTop_toBottomOf="@+id/correctionMenu"
-        android:orientation="vertical"
         android:visibility="gone">
-        <TextView
+
+        <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:orientation="horizontal">
+
+            <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/noise"
             android:layout_marginStart="@dimen/_5sdp"
+            android:text="@string/noise"
             android:textColor="@color/white"
             android:textSize="@dimen/_12sdp"
             app:layout_constraintBottom_toTopOf="@+id/noiseSeekBar" />
+
+            <EditText
+                android:id="@+id/editTextNoise"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_marginStart="@dimen/_185sdp"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
+                android:text="@string/_0"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:importantForAutofill="no"  />
+        </LinearLayout>
+
         <SeekBar
             android:id="@+id/noiseSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/_12sdp"
             android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@+id/correctionMenu"
-            >
+            app:layout_constraintTop_toBottomOf="@+id/correctionMenu">
+
         </SeekBar>
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/vignetteLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/vignetteLinearLayout"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:layout_marginEnd="@dimen/_20sdp"
+        android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:gravity="center"
-        android:layout_marginStart="@dimen/_20sdp"
-        android:layout_marginEnd="@dimen/_20sdp"
         app:layout_constraintTop_toBottomOf="@+id/correctionMenu"
-        android:orientation="vertical"
         android:visibility="gone">
-        <TextView
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/vignette"
-            android:layout_marginStart="@dimen/_5sdp"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            app:layout_constraintBottom_toTopOf="@+id/vignetteSeekBar"
-            />
+            android:layout_height="28dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:text="@string/vignette"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_12sdp"
+                app:layout_constraintBottom_toTopOf="@+id/vignetteSeekBar" />
+
+            <EditText
+                android:id="@+id/editTextVignette"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_marginStart="@dimen/_165sdp"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
+                android:text="@string/_0"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:importantForAutofill="no"  />
+        </LinearLayout>
+
+
         <SeekBar
             android:id="@+id/vignetteSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/correctionMenu"
-           >
+            android:layout_height="@dimen/_12sdp"
+            app:layout_constraintTop_toBottomOf="@+id/correctionMenu">
+
         </SeekBar>
 
     </LinearLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="20dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

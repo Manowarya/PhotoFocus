@@ -31,21 +31,25 @@ void myTone(Mat& image, float sigma)
 {
     cvtColor(image, image, cv::COLOR_BGR2HSV);
 
+    int hueShift = static_cast<int>((sigma / 10.0) * 180.0);
+
+
     for (int i = 0; i < image.rows; i++)
     {
         for (int j = 0; j < image.cols; j++)
         {
             Vec3b& pixel = image.at<Vec3b>(i, j);
-            int hue = static_cast<int>(pixel[0] + sigma);
+            int hue = static_cast<int>(pixel[0]) + hueShift;
 
             if (hue < 0)
-                hue += 180;
+                hue = 180 + hue;
             else if (hue > 179)
-                hue -= 180;
+                hue = hue - 180;
 
             pixel[0] = static_cast<uchar>(hue);
         }
     }
+
     cvtColor(image, image, COLOR_HSV2BGR);
 }
 
@@ -55,7 +59,9 @@ void mySaturation(Mat& image, float sigma) {
     std::vector<Mat> channels;
     split(image, channels);
 
-    channels[1] *= sigma;
+    float saturationShift = sigma / 10.0;
+
+    channels[1] *= (1.0 + saturationShift);
 
     merge(channels, image);
 
@@ -72,10 +78,12 @@ void myBright(Mat image, float sigma) {
 }
 
 void myExposition(Mat& image, float sigma) {
+    float exposition = sigma / 10.0;
+
     Mat lookup_table(1, 256, CV_8U);
 
     for (int i = 0; i < 256; i++) {
-        int adjusted_value = saturate_cast<uchar>(i * sigma);
+        int adjusted_value = saturate_cast<uchar>(i + i * exposition);
         lookup_table.at<uchar>(i) = adjusted_value;
     }
 
@@ -83,11 +91,50 @@ void myExposition(Mat& image, float sigma) {
 }
 
 void myContrast(Mat& image, float sigma) {
-    image.convertTo(image, -1, sigma, 0);
+    float contrast = (sigma + 10.0) / 10.0;
+
+    image.convertTo(image, -1, contrast, 0);
 }
 
-void myVignette(Mat& image, float sigma)
+/*void myVignette(Mat& image, float sigma)
 {
+    cvtColor(image, image, COLOR_BGR2HSV);
+
+    int width = image.cols;
+    int height = image.rows;
+
+    int centerX = width / 2;
+    int centerY = height / 2;
+
+    double maxDistance = norm(Point(centerX, centerY));
+
+    float vignetteIntensity = std::abs(sigma) / 10.0; // Нормализуем sigma в диапазоне [0, 1]
+
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            double distance = norm(cv::Point(x - centerX, y - centerY));
+            double vignette = vignetteIntensity * distance / maxDistance;
+
+            vignette = std::min(vignette, 1.0);
+
+            if (sigma < 0)
+            {
+                // Черный ореол
+                image.at<Vec3b>(y, x)[2] = static_cast<uchar>(image.at<Vec3b>(y, x)[2] * (1.0 - vignette));
+            }
+            else if (sigma > 0)
+            {
+                // Белый ореол
+                image.at<Vec3b>(y, x)[2] = static_cast<uchar>(255 - (255 - image.at<Vec3b>(y, x)[2]) * vignette);
+            }
+        }
+    }
+
+    cvtColor(image, image, COLOR_HSV2BGR);
+}*/
+void myVignette(Mat& image, float sigma) {
     cvtColor(image, image, COLOR_BGR2HSV);
 
     int width = image.cols;
@@ -115,3 +162,8 @@ void myVignette(Mat& image, float sigma)
 
     cvtColor(image, image, COLOR_HSV2BGR);
 }
+
+
+
+
+

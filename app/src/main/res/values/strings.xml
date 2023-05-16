@@ -31,4 +31,5 @@
     <string name="bright">Яркость</string>
     <string name="exposition">Экспозиция</string>
     <string name="contrast">Контрастность</string>
+    <string name="_0">0</string>
 </resources>
