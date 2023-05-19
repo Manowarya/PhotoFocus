@@ -130,7 +130,28 @@ void myVignette(Mat& image, float sigma) {
 
     cvtColor(image, image, COLOR_HSV2BGR);
 }
+void myAutocorrect(Mat& image) {
+    Mat floatImage;
+    image.convertTo(floatImage, CV_32F, 1.0 / 255.0);
 
+    std::vector<Mat> channels;
+    split(floatImage, channels);
+
+    Scalar meanR = mean(channels[2]);
+    Scalar meanG = mean(channels[1]);
+    Scalar meanB = mean(channels[0]);
+
+    float scaleR = meanG[0] / meanR[0];
+    float scaleB = meanG[0] / meanB[0];
+
+    channels[2] = channels[2] * scaleR;
+    channels[0] = channels[0] * scaleB;
+    channels[1] = channels[1] * 1.0;
+
+    merge(channels, floatImage);
+
+    floatImage.convertTo(image, CV_8U, 255.0);
+}
 
 
 

@@ -81,6 +81,11 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             toolsLayout.visibility=View.GONE
             correction(toolsLayout)
         }
+        val autocorrectionBtn = findViewById<TextView>(R.id.autocorrectionBtn)
+        autocorrectionBtn.setOnClickListener {
+            myAutocorrect(bitmap!!, dstBitmap!!)
+            editImageBinding.imagePreview.setImageBitmap(dstBitmap)
+        }
     }
 
     private fun crop(toolsLayout: HorizontalScrollView) {
@@ -259,8 +264,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         color.setOnClickListener{
             handleTextViewClick(color)
             linearLayoutVisible(colorLinearLayout)
-            editTextTone!!.setText("0")
-
         }
         light.setOnClickListener{
             handleTextViewClick(light)
@@ -310,6 +313,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     private external fun myBright(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     private external fun mySaturation(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
     private external fun myVignette(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
+    private external fun myAutocorrect(bitmapIn: Bitmap, bitmapOut: Bitmap)
 
     private var tone: Float = 0.0F
     private var saturation: Float = 1.0F
@@ -351,7 +355,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     override fun onStartTrackingTouch(p0: SeekBar?) {}
 
     override fun onStopTrackingTouch(p0: SeekBar?) {
-
         when (p0) {
             toneSeekBar -> editTextTone!!.setText((p0!!.progress - 100).toString())
             saturationSeekBar -> editTextSaturation!!.setText((p0!!.progress - 100).toString())

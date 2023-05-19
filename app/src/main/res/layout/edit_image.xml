@@ -167,8 +167,6 @@
 
         <include layout="@layout/text" />
 
-        <include layout="@layout/autocorretion" />
-
         <include layout="@layout/templates" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

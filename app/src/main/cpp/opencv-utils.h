@@ -12,4 +12,4 @@ void myContrast(Mat& image, float sigma);
 void myBlur(Mat& image, float sigma);
 void myNoise(Mat image, float sigma);
 void myVignette(Mat& image, float sigma);
-
+void myAutocorrect(Mat& image);
