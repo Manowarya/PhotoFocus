@@ -32,7 +32,9 @@
                 android:layout_marginTop="@dimen/_4sdp"
                 android:layout_marginBottom="@dimen/_4sdp"
                 android:backgroundTint="@color/gray"
-                app:drawableTopCompat="@drawable/ic_arrow_back" />
+                android:minHeight="48dp"
+                android:contentDescription="@string/back"
+                app:drawableTopCompat="@drawable/ic_arrow_back"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveBtn"
@@ -87,7 +89,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/editToolsWrapper"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="180dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <HorizontalScrollView

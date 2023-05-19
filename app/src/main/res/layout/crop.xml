@@ -9,7 +9,7 @@
     >
 
     <LinearLayout
-        android:id="@+id/cropMenu"
+        android:id="@+id/correctionLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_60sdp"
@@ -22,13 +22,16 @@
 
         <TextView
             android:id="@+id/fixcropping"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_12sdp"
             android:drawablePadding="@dimen/_5sdp"
             android:text="@string/fixcropping"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_14sdp" />
+            android:textColor="@drawable/selector"
+            android:textSize="@dimen/_14sdp"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <TextView
             android:id="@+id/cropping"
@@ -36,9 +39,12 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_12sdp"
             android:drawablePadding="@dimen/_5sdp"
+
             android:text="@string/croping"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_14sdp" />
+            android:textColor="@drawable/selector"
+            android:textSize="@dimen/_14sdp"
+            android:clickable="true"
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/rotation"
@@ -47,8 +53,10 @@
             android:layout_marginHorizontal="@dimen/_12sdp"
             android:drawablePadding="@dimen/_5sdp"
             android:text="@string/rotation"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_14sdp" />
+            android:textColor="@drawable/selector"
+            android:textSize="@dimen/_14sdp"
+            android:clickable="true"
+            android:focusable="true"/>
     </LinearLayout>
 
     <HorizontalScrollView
@@ -57,7 +65,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cropMenu">
+        app:layout_constraintTop_toBottomOf="@+id/correctionLayout">
 
         <LinearLayout
             android:id="@+id/fixCropLayout"
@@ -137,7 +145,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cropMenu"
+        app:layout_constraintTop_toBottomOf="@+id/correctionLayout"
         android:visibility="gone">
 
         <TextView

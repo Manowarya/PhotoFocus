@@ -21,4 +21,16 @@
     <string name="vert">Отразить \n по верт</string>
     <string name="right">Направо</string>
     <string name="left">Налево</string>
+    <string name="color">Цвет</string>
+    <string name="light">Свет</string>
+    <string name="vignette">Виньетка</string>
+    <string name="blur">Размытие фона</string>
+    <string name="noise">Зерно</string>
+    <string name="tone">Оттенок</string>
+    <string name="saturation">Насыщенность</string>
+    <string name="bright">Яркость</string>
+    <string name="exposition">Экспозиция</string>
+    <string name="contrast">Контрастность</string>
+    <string name="_0">0</string>
+    <string name="back">back</string>
 </resources>

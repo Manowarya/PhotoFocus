@@ -12,6 +12,8 @@ project("PhotoFocus")
 set(OpenCV_STATIC on)
 set(OpenCV_DIR $ENV{OPENCV_ANDROID}/sdk/native/jni)
 
+include_directories(${OpenCV_INCLUDE_DIRS})
+
 find_package(OpenCV REQUIRED)
 
 
@@ -43,7 +45,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -static-openmp")
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-        opencv2
+        native-lib
 
         # Sets the library as a shared library.
         SHARED
@@ -72,7 +74,7 @@ find_library(jnigraphics-lib jnigraphics)
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-        opencv2
+        native-lib
 
         # Links the target library to the log library
         # included in the NDK.
