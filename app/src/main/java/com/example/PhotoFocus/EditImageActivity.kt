@@ -16,6 +16,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import com.example.PhotoFocus.databinding.EditImageBinding
 import java.lang.Float.max
 import kotlin.concurrent.thread
@@ -26,8 +27,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             System.loadLibrary("native-lib")
         }
     }
-    var bitmap: Bitmap? = null
-    var dstBitmap: Bitmap? = null
+    private var bitmap: Bitmap? = null
+    private var dstBitmap: Bitmap? = null
 
     private lateinit var editImageBinding: EditImageBinding
 
@@ -91,11 +92,11 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         val fixCropLayout = findViewById<LinearLayout>(R.id.fixCropLayout)
         val cropOriginal = findViewById<TextView>(R.id.cropOriginal)
-        val crop1_1 = findViewById<TextView>(R.id.crop1_1)
-        val crop1_2 = findViewById<TextView>(R.id.crop1_2)
-        val crop16_9 = findViewById<TextView>(R.id.crop16_9)
-        val crop4_3 = findViewById<TextView>(R.id.crop4_3)
-        val crop3_1 = findViewById<TextView>(R.id.crop3_1)
+        val crop11 = findViewById<TextView>(R.id.crop1_1)
+        val crop12 = findViewById<TextView>(R.id.crop1_2)
+        val crop169 = findViewById<TextView>(R.id.crop16_9)
+        val crop43 = findViewById<TextView>(R.id.crop4_3)
+        val crop31 = findViewById<TextView>(R.id.crop3_1)
 
         val rotationLayout = findViewById<LinearLayout>(R.id.rotationLayout)
         val leftRotation = findViewById<TextView>(R.id.left)
@@ -118,19 +119,19 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             cropOriginal.setOnClickListener {
                 editImageBinding.cropImageView.setFixedAspectRatio(false)
             }
-            crop1_1.setOnClickListener {
+            crop11.setOnClickListener {
                 editImageBinding.cropImageView.setAspectRatio(1, 1)
             }
-            crop1_2.setOnClickListener {
+            crop12.setOnClickListener {
                 editImageBinding.cropImageView.setAspectRatio(1, 2)
             }
-            crop16_9.setOnClickListener {
+            crop169.setOnClickListener {
                 editImageBinding.cropImageView.setAspectRatio(16, 9)
             }
-            crop4_3.setOnClickListener {
+            crop43.setOnClickListener {
                 editImageBinding.cropImageView.setAspectRatio(4, 3)
             }
-            crop3_1.setOnClickListener {
+            crop31.setOnClickListener {
                 editImageBinding.cropImageView.setAspectRatio(3, 1)
             }
         }
@@ -160,8 +161,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         backBtn.setOnClickListener{
             saveBtn.visibility = View.VISIBLE
             toolsLayout.visibility=View.VISIBLE
-            rotation.setTextColor(resources.getColor(R.color.white))
-            cropping.setTextColor(resources.getColor(R.color.white))
+            rotation.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
+            cropping.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
             cropTools.visibility = View.GONE
             bitmap = editImageBinding.cropImageView.getCroppedImage()!!
             editImageBinding.imagePreview.setImageBitmap(bitmap)
@@ -291,8 +292,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         }
     }
     private fun handleTextViewClick(textView: TextView) {
-        selectedTextView?.setTextColor(resources.getColor(R.color.white))
-        textView.setTextColor(resources.getColor(R.color.button))
+        selectedTextView?.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
+        textView.setTextColor(ContextCompat.getColor(applicationContext, R.color.button))
         selectedTextView = textView
     }
     private fun linearLayoutVisible(linearLayout: LinearLayout) {

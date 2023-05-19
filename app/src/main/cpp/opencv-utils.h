@@ -4,7 +4,6 @@
 
 using namespace cv;
 
-void myFlip(Mat image);
 void myTone(Mat& image, float sigma);
 void mySaturation(Mat& image, float sigma);
 void myBright(Mat image, float sigma);

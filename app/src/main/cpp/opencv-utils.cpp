@@ -2,9 +2,6 @@
 #include <opencv2/imgproc.hpp>
 #include <thread>
 
-void myFlip(Mat image) {
-    flip(image, image, 0);
-}
 void myBlur(Mat& image, float sigma) {
     Mat blurredImage;
     GaussianBlur(image, blurredImage, Size(0, 0), sigma);
@@ -47,7 +44,7 @@ void myTone(Mat& image, float sigma)
     {
         for (int j = 0; j < image.cols; j++)
         {
-            Vec3b& pixel = image.at<Vec3b>(i, j);
+            auto& pixel = image.at<Vec3b>(i, j);
             int hue = static_cast<int>(pixel[0]) + hueShift;
 
             if (hue < 0)
@@ -68,7 +65,7 @@ void mySaturation(Mat& image, float sigma) {
     std::vector<Mat> channels;
     split(image, channels);
 
-    float saturationShift = sigma / 10.0;
+    float saturationShift = sigma / 10.0F;
 
     channels[1] *= (1.0 + saturationShift);
 
@@ -87,7 +84,7 @@ void myBright(Mat image, float sigma) {
 }
 
 void myExposition(Mat& image, float sigma) {
-    float exposition = sigma / 10.0;
+    float exposition = sigma / 10.0F;
 
     Mat lookup_table(1, 256, CV_8U);
 
@@ -100,7 +97,7 @@ void myExposition(Mat& image, float sigma) {
 }
 
 void myContrast(Mat& image, float sigma) {
-    float contrast = (sigma + 10.0) / 10.0;
+    float contrast = (sigma + 10.0F) / 10.0F;
 
     image.convertTo(image, -1, contrast, 0);
 }

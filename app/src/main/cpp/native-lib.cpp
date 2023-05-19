@@ -8,7 +8,7 @@
 void bitmapToMat(JNIEnv *env, jobject bitmap, Mat& dst, jboolean needUnPremultiplyAlpha)
 {
     AndroidBitmapInfo  info;
-    void*              pixels = 0;
+    void*              pixels = nullptr;
 
     try {
         CV_Assert( AndroidBitmap_getInfo(env, bitmap, &info) >= 0 );
@@ -37,10 +37,10 @@ void bitmapToMat(JNIEnv *env, jobject bitmap, Mat& dst, jboolean needUnPremultip
     }
 }
 
-void matToBitmap(JNIEnv* env, Mat src, jobject bitmap, jboolean needPremultiplyAlpha)
+void matToBitmap(JNIEnv* env, const Mat& src, jobject bitmap, jboolean needPremultiplyAlpha)
 {
     AndroidBitmapInfo  info;
-    void*              pixels = 0;
+    void*              pixels = nullptr;
 
     try {
         CV_Assert( AndroidBitmap_getInfo(env, bitmap, &info) >= 0 );
@@ -91,19 +91,6 @@ Java_com_example_PhotoFocus_EditImageActivity_stringFromJNI(
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
 }
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_flip(JNIEnv *env, jobject p_this, jobject bitmapIn, jobject bitmapOut) {
-    Mat src;
-    bitmapToMat(env, bitmapIn, src, false);
-    // NOTE bitmapToMat returns Mat in RGBA format, if needed convert to BGRA using cvtColor
-
-    myFlip(src);
-
-    // NOTE matToBitmap expects Mat in GRAY/RGB(A) format, if needed convert using cvtColor
-    matToBitmap(env, src, bitmapOut, false);
-}
-
 
 extern "C"
 JNIEXPORT void JNICALL
