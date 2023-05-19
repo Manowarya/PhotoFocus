@@ -169,3 +169,13 @@ Java_com_example_PhotoFocus_EditImageActivity_myVignette(JNIEnv *env, jobject, j
     myVignette(src, sigma);
     matToBitmap(env, src, bitmap_out, false);
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myAutocorrect(JNIEnv *env, jobject, jobject bitmap_in,
+                                                         jobject bitmap_out) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    myAutocorrect(src);
+    matToBitmap(env, src, bitmap_out, false);
+}
