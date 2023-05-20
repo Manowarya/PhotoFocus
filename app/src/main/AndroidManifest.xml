@@ -3,14 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
     <queries>
         <intent>
             <action android:name="android.intent.action.OPEN_DOCUMENT" />
+
             <category android:name="android.intent.category.DEFAULT" />
         </intent>
     </queries>
@@ -26,11 +28,10 @@
         android:theme="@style/Theme.PhotoFocus"
         tools:targetApi="31">
         <activity
-            android:name=".ImageFullActivity"
-            android:exported="false" />
-        <activity
             android:name=".GalleryActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.PhotoFocus"
+            />
         <activity
             android:name=".SplashScreenActivity"
             android:exported="true"
