@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.example.PhotoFocus.databinding.EditImageBinding
 import java.lang.Float.max
 import kotlin.concurrent.thread
@@ -70,10 +71,11 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         supportActionBar?.hide()
         setContentView(editImageBinding.root)
 
-        val extras = intent.extras ?: return
-        val uriString = extras.getString(MainActivity.KEY_IMAGE_URI)
+        val imagePath=intent.getStringExtra("path")
+
         val view = findViewById<ImageView>(R.id.imagePreview)
-        view.setImageURI(Uri.parse(uriString))
+
+        view.setImageURI(Uri.parse(imagePath))
 
         toolsLayout = findViewById(R.id.toolsLayout)
         saveBtn = findViewById(R.id.saveBtn)
@@ -353,7 +355,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         dstBitmap = tempBitmap
 
-
         editImageBinding.imagePreview.setImageBitmap(dstBitmap)
     }
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -371,9 +372,9 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             noiseSeekBar -> editTextNoise!!.setText((p0!!.progress).toString())
             vignetteSeekBar -> editTextVignette!!.setText((p0!!.progress).toString())
         }
-        thread {
-            applyEffects()
-        }
+            thread {
+                applyEffects()
+            }
     }
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -424,6 +425,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                 }
             }
         } else {
+            editImageBinding.imagePreview.setImageResource(0)
             finish()
         }
     }
