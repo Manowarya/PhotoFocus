@@ -11,8 +11,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
 class GalleryAdapter(private var context: Context, private var imagesList: ArrayList<Image>):RecyclerView.Adapter<GalleryAdapter.ImageViewHolder>() {
-
-
    class ImageViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
        var image: ImageView?=null
 
@@ -20,7 +18,6 @@ class GalleryAdapter(private var context: Context, private var imagesList: Array
            image=itemView.findViewById(R.id.row_image)
        }
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.gallery_item, parent, false)

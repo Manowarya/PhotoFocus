@@ -1,11 +1,17 @@
 package com.example.PhotoFocus
 
+import android.content.ContentValues
+import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -14,11 +20,15 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
 import com.example.PhotoFocus.databinding.EditImageBinding
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.lang.Float.max
 import kotlin.concurrent.thread
 
@@ -71,7 +81,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         supportActionBar?.hide()
         setContentView(editImageBinding.root)
 
-        val imagePath=intent.getStringExtra("path")
+        val imagePath = intent.getStringExtra("path")
 
         val view = findViewById<ImageView>(R.id.imagePreview)
 
@@ -81,7 +91,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         saveBtn = findViewById(R.id.saveBtn)
         editImageBinding.cropBtn.setOnClickListener {
             screenStack.add("crop")
-            toolsLayout!!.visibility=View.GONE
+            toolsLayout!!.visibility = View.GONE
             crop()
         }
 
@@ -93,7 +103,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         editImageBinding.correctionBtn.setOnClickListener {
             screenStack.add("correction")
-            toolsLayout!!.visibility=View.GONE
+            toolsLayout!!.visibility = View.GONE
             correction()
         }
         val autocorrectionBtn = findViewById<TextView>(R.id.autocorrectionBtn)
@@ -102,13 +112,67 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             editImageBinding.imagePreview.setImageBitmap(dstBitmap)
         }
         backBtn = findViewById(R.id.backBtn)
-        backBtn!!.setOnClickListener{
+        backBtn!!.setOnClickListener {
             onBackPressed()
         }
 
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            1
+        )
+
         val saveBtn = findViewById<Button>(R.id.saveBtn)
 
+        saveBtn.setOnClickListener {
+            bitmap = getImageOfView(editImageBinding.imagePreview)
+            if (bitmap != null) {
+                saveImageToGallery(bitmap!!)
+            }
+            onBackPressed()
+            val intent = Intent(this, GalleryActivity::class.java)
+            startActivity(intent)
+        }
     }
+
+    private fun getImageOfView(imageView: ImageView): Bitmap? {
+        var image: Bitmap? = null
+        try {
+            image = Bitmap.createBitmap(editImageBinding.imagePreview.measuredWidth, editImageBinding.imagePreview.measuredHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(image)
+            imageView.draw(canvas)
+        } catch (e: java.lang.Exception){
+            Log.e("Cannot", "cannot capture")
+        }
+        return image
+    }
+    fun saveImageToGallery(bitmap: Bitmap) {
+        val imageName = "photofocus_${System.currentTimeMillis()}.jpg"
+        var fos: OutputStream? = null
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q) {
+            this.contentResolver?.also {resolver ->
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, imageName)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+                }
+                val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                fos = imageUri?.let {
+                    resolver.openOutputStream(it)
+                }
+            }
+        }
+        else {
+            val imagesDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            val image = File(imagesDirectory, imageName)
+            fos = FileOutputStream(image)
+        }
+        fos?.use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+            Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun crop() {
         cropTools = findViewById(R.id.cropBtnsLayout)
         cropping = findViewById(R.id.cropping)
