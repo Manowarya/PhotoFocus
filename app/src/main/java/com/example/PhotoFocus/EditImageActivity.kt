@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -396,49 +397,101 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     private var noise: Float = 0.0F
     private var vignette: Float = 0.0F
 
-    private fun applyEffects() {
-        val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
-        tone = max(0.1F, toneSeekBar!!.progress / 10F)
+    private var shouldApplyTone: Boolean = false
+    private var shouldApplySaturation: Boolean = false
+    private var shouldApplyBright: Boolean = false
+    private var shouldApplyExposition: Boolean = false
+    private var shouldApplyContrast: Boolean = false
+    private var shouldApplyBlur: Boolean = false
+    private var shouldApplyNoise: Boolean = false
+    private var shouldApplyVignette: Boolean = false
+    private inner class ApplyEffectsTask( ) : AsyncTask<Void, Void, Bitmap>() {
+        override fun doInBackground(vararg params: Void): Bitmap {
+            val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
 
-        saturation = max(1.0F, saturationSeekBar!!.progress / 10F)
-        bright = max(0.1F, brightSeekBar!!.progress / 10F)
-        exposition = max(0.1F, expositionSeekBar!!.progress / 10F)
-        contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
-        blur = max(0.1F, blurSeekBar!!.progress / 1F)
-        noise =  max(0.1F, noiseSeekBar!!.progress / 10F)
-        vignette =  max(0.1F, vignetteSeekBar!!.progress / 10F)
+            tone = max(0.1F, toneSeekBar!!.progress / 10F)
+            saturation = max(1.0F, saturationSeekBar!!.progress / 10F)
+            bright = max(0.1F, brightSeekBar!!.progress / 10F)
+            exposition = max(0.1F, expositionSeekBar!!.progress / 10F)
+            contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
+            blur = max(0.1F, blurSeekBar!!.progress / 1F)
+            noise = max(0.1F, noiseSeekBar!!.progress / 10F)
+            vignette = max(0.1F, vignetteSeekBar!!.progress / 10F)
 
-        myTone(tempBitmap, tempBitmap, tone - 10F)
-        mySaturation(tempBitmap, tempBitmap, saturation - 10F)
-        myBright(tempBitmap, tempBitmap, bright - 10F)
-        myExposition(tempBitmap, tempBitmap, exposition - 10F)
-        myContrast(tempBitmap, tempBitmap, contrast - 10F)
-        myBlur(tempBitmap, tempBitmap, blur)
-        myNoise(tempBitmap, tempBitmap, noise)
-        myVignette(tempBitmap, tempBitmap, vignette)
+            if (shouldApplyTone) {
+                myTone(tempBitmap, tempBitmap, tone - 10F)
+            }
+            if (shouldApplySaturation) {
+                mySaturation(tempBitmap, tempBitmap, saturation - 10F)
+            }
+            if (shouldApplyBright) {
+                myBright(tempBitmap, tempBitmap, bright - 10F)
+            }
+            if (shouldApplyExposition) {
+                myExposition(tempBitmap, tempBitmap, exposition - 10F)
+            }
+            if (shouldApplyContrast) {
+                myContrast(tempBitmap, tempBitmap, contrast - 10F)
+            }
+            if (shouldApplyBlur) {
+                myBlur(tempBitmap, tempBitmap, blur)
+            }
+            if (shouldApplyNoise){
+                myNoise(tempBitmap, tempBitmap, noise)
+            }
+            if (shouldApplyVignette) {
+                myVignette(tempBitmap, tempBitmap, vignette)
+            }
 
-        dstBitmap = tempBitmap
-
-        editImageBinding.imagePreview.setImageBitmap(dstBitmap)
+            return tempBitmap
+        }
+        override fun onPostExecute(result: Bitmap) {
+            dstBitmap = result
+            editImageBinding.imagePreview.setImageBitmap(dstBitmap)
+        }
     }
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+
     }
     override fun onStartTrackingTouch(p0: SeekBar?) {}
 
-    override fun onStopTrackingTouch(p0: SeekBar?) {
-        when (p0) {
-            toneSeekBar -> editTextTone!!.setText((p0!!.progress - 100).toString())
-            saturationSeekBar -> editTextSaturation!!.setText((p0!!.progress - 100).toString())
-            brightSeekBar -> editTextBright!!.setText((p0!!.progress - 100).toString())
-            expositionSeekBar -> editTextExposition!!.setText((p0!!.progress - 100).toString())
-            contrastSeekBar -> editTextContrast!!.setText((p0!!.progress - 100).toString())
-            blurSeekBar -> editTextBlur!!.setText((p0!!.progress).toString())
-            noiseSeekBar -> editTextNoise!!.setText((p0!!.progress).toString())
-            vignetteSeekBar -> editTextVignette!!.setText((p0!!.progress).toString())
-        }
-            thread {
-                applyEffects()
+    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+        when (seekBar) {
+            toneSeekBar -> {
+                editTextTone!!.setText((seekBar!!.progress - 100).toString())
+                shouldApplyTone = true
+
             }
+            saturationSeekBar -> {
+                editTextSaturation!!.setText((seekBar!!.progress - 100).toString())
+                shouldApplySaturation = true
+            }
+            brightSeekBar -> {
+                editTextBright!!.setText((seekBar!!.progress - 100).toString())
+                shouldApplyBright = true
+            }
+            expositionSeekBar -> {
+                editTextExposition!!.setText((seekBar!!.progress - 100).toString())
+                shouldApplyExposition = true
+            }
+            contrastSeekBar -> {
+                editTextContrast!!.setText((seekBar!!.progress - 100).toString())
+                shouldApplyContrast = true
+            }
+            blurSeekBar -> {
+                editTextBlur!!.setText((seekBar!!.progress).toString())
+                shouldApplyBlur = true
+            }
+            noiseSeekBar -> {
+                editTextNoise!!.setText((seekBar!!.progress).toString())
+                shouldApplyNoise = true
+            }
+            vignetteSeekBar -> {
+                editTextVignette!!.setText((seekBar!!.progress).toString())
+                shouldApplyVignette = true
+            }
+        }
+        ApplyEffectsTask().execute()
     }
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -452,18 +505,40 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         p0?.let {
             val value = p0.toString().toIntOrNull() ?: 0
             when (p0) {
-                editTextTone!!.text -> toneSeekBar!!.progress = value + 100
-                editTextSaturation!!.text -> saturationSeekBar!!.progress = value + 100
-                editTextBright!!.text -> brightSeekBar!!.progress = value + 100
-                editTextExposition!!.text -> expositionSeekBar!!.progress = value + 100
-                editTextContrast!!.text -> contrastSeekBar!!.progress = value + 100
-                editTextBlur!!.text -> blurSeekBar!!.progress = value
-                editTextNoise!!.text -> noiseSeekBar!!.progress = value
-                editTextVignette!!.text -> vignetteSeekBar!!.progress = value
+                editTextTone!!.text -> {
+                    toneSeekBar!!.progress = value + 100
+                    shouldApplyTone = true
+                }
+                editTextSaturation!!.text -> {
+                    saturationSeekBar!!.progress = value + 100
+                    shouldApplySaturation = true
+                }
+                editTextBright!!.text -> {
+                    brightSeekBar!!.progress = value + 100
+                    shouldApplyBright = true
+                }
+                editTextExposition!!.text -> {
+                    expositionSeekBar!!.progress = value + 100
+                    shouldApplyExposition = true
+                }
+                editTextContrast!!.text -> {
+                    contrastSeekBar!!.progress = value + 100
+                    shouldApplyContrast = true
+                }
+                editTextBlur!!.text -> {
+                    blurSeekBar!!.progress = value
+                    shouldApplyBlur = true
+                }
+                editTextNoise!!.text -> {
+                    noiseSeekBar!!.progress = value
+                    shouldApplyNoise = true
+                }
+                editTextVignette!!.text -> {
+                    vignetteSeekBar!!.progress = value
+                    shouldApplyVignette = true
+                }
             }
-            thread {
-                applyEffects()
-            }
+            ApplyEffectsTask().execute()
         }
     }
     override fun onBackPressed() {
