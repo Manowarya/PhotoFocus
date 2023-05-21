@@ -1,9 +1,11 @@
 package com.example.PhotoFocus
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -12,16 +14,9 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
+import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.HorizontalScrollView
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.SeekBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -31,7 +26,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.lang.Float.max
-import kotlin.concurrent.thread
 
 class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, TextWatcher {
     companion object {
@@ -76,6 +70,9 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     private var rotation: TextView? = null
     private var colorLinearLayout: LinearLayout? = null
 
+    private lateinit var imagePreview: ImageView
+    private lateinit var editText: EditText
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         editImageBinding = EditImageBinding.inflate(layoutInflater)
@@ -84,9 +81,10 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         val imagePath = intent.getStringExtra("path")
 
-        val view = findViewById<ImageView>(R.id.imagePreview)
+        imagePreview = findViewById(R.id.imagePreview)
 
-        view.setImageURI(Uri.parse(imagePath))
+        imagePreview.setImageURI(Uri.parse(imagePath))
+        resizeImageViewToImageBounds(imagePreview)
 
         toolsLayout = findViewById(R.id.toolsLayout)
         saveBtn = findViewById(R.id.saveBtn)
@@ -96,9 +94,9 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             crop()
         }
 
-        view.visibility = View.VISIBLE
+        imagePreview.visibility = View.VISIBLE
 
-        bitmap = (view.drawable as BitmapDrawable).bitmap
+        bitmap = (imagePreview.drawable as BitmapDrawable).bitmap
 
         dstBitmap = bitmap!!.copy(bitmap!!.config, true)
 
@@ -107,11 +105,17 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             toolsLayout!!.visibility = View.GONE
             correction()
         }
+
         val autocorrectionBtn = findViewById<TextView>(R.id.autocorrectionBtn)
         autocorrectionBtn.setOnClickListener {
             myAutocorrect(bitmap!!, dstBitmap!!)
             editImageBinding.imagePreview.setImageBitmap(dstBitmap)
         }
+
+        editImageBinding.textBtn.setOnClickListener {
+            myText()
+        }
+
         backBtn = findViewById(R.id.backBtn)
         backBtn!!.setOnClickListener {
             onBackPressed()
@@ -126,9 +130,9 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val saveBtn = findViewById<Button>(R.id.saveBtn)
 
         saveBtn.setOnClickListener {
-            bitmap = getImageOfView(editImageBinding.imagePreview)
-            if (bitmap != null) {
-                saveImageToGallery(bitmap!!)
+            val combinedBitmap = combineImageAndText(imagePreview.drawable, editText.text.toString())
+            if (combinedBitmap != null) {
+                saveImageToGallery(combinedBitmap)
             }
             onBackPressed()
             val intent = Intent(this, GalleryActivity::class.java)
@@ -136,17 +140,135 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         }
     }
 
-    private fun getImageOfView(imageView: ImageView): Bitmap? {
-        var image: Bitmap? = null
-        try {
-            image = Bitmap.createBitmap(editImageBinding.imagePreview.measuredWidth, editImageBinding.imagePreview.measuredHeight, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(image)
-            imageView.draw(canvas)
-        } catch (e: java.lang.Exception){
-            Log.e("Cannot", "cannot capture")
+    @SuppressLint("ClickableViewAccessibility")
+    private fun myText() {
+        editText = findViewById(R.id.editText)
+        editText.visibility= View.VISIBLE
+
+        var isMoving = false
+        var previousX = 0f
+        var previousY = 0f
+
+        editText.setOnTouchListener { _, motionEvent ->
+            editText.requestFocus()
+            false
         }
-        return image
+
+        imagePreview.setOnTouchListener { view, motionEvent ->
+            val imageRect = Rect()
+            imagePreview.getGlobalVisibleRect(imageRect)
+
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    isMoving = true
+                    previousX = motionEvent.rawX
+                    previousY = motionEvent.rawY
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (isMoving) {
+                        val dx = motionEvent.rawX - previousX
+                        val dy = motionEvent.rawY - previousY
+                        val newX = editText.x + dx
+                        val newY = editText.y + dy
+
+                        val newRect = Rect(
+                            newX.toInt(),
+                            newY.toInt(),
+                            (newX + editText.width).toInt(),
+                            (newY + editText.height).toInt()
+                        )
+
+                        val scaledImageRect = Rect(
+                            imagePreview.x.toInt(),
+                            imagePreview.y.toInt(),
+                            (imagePreview.x + imagePreview.width).toInt(),
+                            (imagePreview.y + imagePreview.height).toInt()
+                        )
+
+                        if (scaledImageRect.contains(newRect)) {
+                            editText.x = newX
+                            editText.y = newY
+                            previousX = motionEvent.rawX
+                            previousY = motionEvent.rawY
+                        }
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    isMoving = false
+                    true
+                }
+                else -> false
+            }
+        }
     }
+
+    private fun resizeImageViewToImageBounds(imageView: ImageView) {
+        val imageDrawable = imageView.drawable
+        val imageWidth = imageDrawable?.intrinsicWidth ?: 0
+        val imageHeight = imageDrawable?.intrinsicHeight ?: 0
+
+        val imageViewWidth = imageView.width
+        val imageViewHeight = imageView.height
+
+        val scaleFactorX = imageViewWidth.toFloat() / imageWidth.toFloat()
+        val scaleFactorY = imageViewHeight.toFloat() / imageHeight.toFloat()
+
+        val scale = if (scaleFactorX > scaleFactorY) scaleFactorY else scaleFactorX
+
+        val scaledImageWidth = (imageWidth * scale).toInt()
+        val scaledImageHeight = (imageHeight * scale).toInt()
+
+        val layoutParams = imageView.layoutParams
+        layoutParams.width = scaledImageWidth
+        layoutParams.height = scaledImageHeight
+        imageView.layoutParams = layoutParams
+    }
+    fun combineImageAndText(imageDrawable: Drawable, text: String): Bitmap? {
+        val imageBitmap = (imageDrawable as BitmapDrawable).bitmap
+
+        val combinedBitmap = Bitmap.createBitmap(imageBitmap.width, imageBitmap.height, Bitmap.Config.ARGB_8888)
+
+        val canvas = Canvas(combinedBitmap)
+        canvas.drawBitmap(imageBitmap, 0f, 0f, null)
+
+        val scaleFactorX = imageBitmap.width.toFloat() / imagePreview.width.toFloat()
+        val scaleFactorY = imageBitmap.height.toFloat() / imagePreview.height.toFloat()
+        val scale = if (scaleFactorX > scaleFactorY) scaleFactorY else scaleFactorX
+
+        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        textPaint.color = Color.WHITE
+        textPaint.textSize = editText.getTextSize() * scale
+
+        val imageDrawable = imagePreview.drawable
+        val imageWidth = imageDrawable.intrinsicWidth
+        val imageHeight = imageDrawable.intrinsicHeight
+
+        val imageViewWidth = imagePreview.width
+        val imageViewHeight = imagePreview.height
+
+
+        val scaledImageWidth = (imageWidth * scaleFactorX).toInt()
+        val scaledImageHeight = (imageHeight * scaleFactorY).toInt()
+
+        val imageRect = Rect(
+            (imagePreview.x + (imageViewWidth - scaledImageWidth) / 2).toInt(),
+            (imagePreview.y + (imageViewHeight - scaledImageHeight) / 2).toInt(),
+            (imagePreview.x + (imageViewWidth + scaledImageWidth) / 2).toInt(),
+            (imagePreview.y + (imageViewHeight + scaledImageHeight) / 2).toInt()
+        )
+
+        val offsetX = imageRect.left
+        val offsetY = imageRect.top
+
+        val textX = (editText.x - offsetX) * (imageBitmap.width.toFloat() / scaledImageWidth.toFloat())
+        val textY = (editText.y - offsetY) * (imageBitmap.height.toFloat() / scaledImageHeight.toFloat())  - textPaint.descent()
+        canvas.drawText(text, textX, textY, textPaint)
+
+        return combinedBitmap
+    }
+
     fun saveImageToGallery(bitmap: Bitmap) {
         val imageName = "photofocus_${System.currentTimeMillis()}.jpg"
         var fos: OutputStream? = null
