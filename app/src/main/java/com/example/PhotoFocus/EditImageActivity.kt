@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.example.PhotoFocus.databinding.EditImageBinding
 import org.w3c.dom.Text
 import java.io.File
@@ -164,6 +165,10 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val textColorBlue = findViewById<ImageView>(R.id.textColorBlue)
         val textColorPurple = findViewById<ImageView>(R.id.textColorPurple)
 
+        val textFont_1 = findViewById<ImageView>(R.id.textFont_1)
+        val textFont_2 = findViewById<ImageView>(R.id.textFont_2)
+        val textFont_3 = findViewById<ImageView>(R.id.textFont_3)
+
         var isMoving = false
         var previousX = 0f
         var previousY = 0f
@@ -261,10 +266,27 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         textColorPurple.setOnClickListener {
             editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.purple_200))
         }
+        val typeface = ResourcesCompat.getFont(this, R.font.nevduplenysh_regular)
         fonts.setOnClickListener {
+
+            val bitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+
+            val paint = Paint()
+            paint.typeface = typeface
+            paint.textSize = 48f
+            paint.color = Color.BLACK
+
+            canvas.drawText("Abcd", 25f, 120f, paint)
+
+            textFont_1.setImageBitmap(bitmap)
+
             handleTextViewClick(fonts)
             linearLayoutVisible(fontsTextLayout!!)
             colorToolsLayout.visibility = View.GONE
+        }
+        textFont_1.setOnClickListener {
+            editText.typeface = typeface
         }
     }
     fun combineImageAndText(imageDrawable: Drawable, text: String): Bitmap? {
@@ -285,6 +307,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         textPaint.color = editText.currentTextColor
         textPaint.textSize = editText.textSize * scale
+        textPaint.setTypeface(editText.typeface)
 
         canvas.drawText(text, textX, textY, textPaint)
 
