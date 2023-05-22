@@ -347,6 +347,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         colorText!!.setOnClickListener {
             handleTextViewClick(colorText!!)
             linearLayoutVisible(colorTextLayout!!)
+            colorToolsHSV.visibility=View.VISIBLE
         }
         textColorWhite.setOnClickListener{
             editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))

@@ -16,6 +16,7 @@
         android:layout_marginStart="@dimen/_20sdp"
         android:layout_marginBottom="@dimen/_120sdp"
         android:gravity="center"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
