@@ -9,7 +9,7 @@
     >
 
     <LinearLayout
-        android:id="@+id/correctionLayout"
+        android:id="@+id/textLinearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/_80sdp"
@@ -47,20 +47,18 @@
     </LinearLayout>
 
     <HorizontalScrollView
-        android:id="@+id/colorToolsLayout"
+        android:id="@+id/colorTextHSV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8sdp"
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/correctionLayout"
-        android:visibility="visible">
+        app:layout_constraintTop_toBottomOf="@+id/textLinearLayout">
 
         <LinearLayout
             android:id="@+id/colorTextLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:orientation="horizontal"
             android:paddingHorizontal="@dimen/_8sdp"
             android:visibility="visible">
@@ -161,13 +159,12 @@
         android:layout_marginStart="@dimen/_8sdp"
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/correctionLayout">
+        app:layout_constraintTop_toBottomOf="@+id/textLinearLayout">
 
         <LinearLayout
             android:id="@+id/fontsTextLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:orientation="horizontal"
             android:paddingHorizontal="@dimen/_8sdp"
             android:visibility="gone">
