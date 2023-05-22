@@ -1,9 +1,11 @@
 package com.example.PhotoFocus
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -12,26 +14,21 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
+import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.HorizontalScrollView
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.SeekBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.example.PhotoFocus.databinding.EditImageBinding
+import org.w3c.dom.Text
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.lang.Float.max
-import kotlin.concurrent.thread
+import java.lang.Float.min
 
 class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, TextWatcher {
     companion object {
@@ -76,6 +73,9 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     private var rotation: TextView? = null
     private var colorLinearLayout: LinearLayout? = null
 
+    private lateinit var imagePreview: ImageView
+    private lateinit var editText: EditText
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         editImageBinding = EditImageBinding.inflate(layoutInflater)
@@ -84,34 +84,43 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         val imagePath = intent.getStringExtra("path")
 
-        val view = findViewById<ImageView>(R.id.imagePreview)
+        imagePreview = findViewById(R.id.imagePreview)
 
-        view.setImageURI(Uri.parse(imagePath))
+        imagePreview.setImageURI(Uri.parse(imagePath))
+
+        imagePreview.visibility = View.VISIBLE
+
+        bitmap = (imagePreview.drawable as BitmapDrawable).bitmap
+
+        dstBitmap = bitmap!!.copy(bitmap!!.config, true)
 
         toolsLayout = findViewById(R.id.toolsLayout)
-        saveBtn = findViewById(R.id.saveBtn)
+
+
         editImageBinding.cropBtn.setOnClickListener {
             screenStack.add("crop")
             toolsLayout!!.visibility = View.GONE
             crop()
         }
 
-        view.visibility = View.VISIBLE
-
-        bitmap = (view.drawable as BitmapDrawable).bitmap
-
-        dstBitmap = bitmap!!.copy(bitmap!!.config, true)
-
         editImageBinding.correctionBtn.setOnClickListener {
             screenStack.add("correction")
             toolsLayout!!.visibility = View.GONE
             correction()
         }
+
         val autocorrectionBtn = findViewById<TextView>(R.id.autocorrectionBtn)
         autocorrectionBtn.setOnClickListener {
             myAutocorrect(bitmap!!, dstBitmap!!)
             editImageBinding.imagePreview.setImageBitmap(dstBitmap)
         }
+
+        editImageBinding.textBtn.setOnClickListener {
+            screenStack.add("text")
+            toolsLayout!!.visibility = View.GONE
+            myText()
+        }
+
         backBtn = findViewById(R.id.backBtn)
         backBtn!!.setOnClickListener {
             onBackPressed()
@@ -122,13 +131,13 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
             1
         )
+        editText = findViewById(R.id.editText)
+        saveBtn = findViewById(R.id.saveBtn)
 
-        val saveBtn = findViewById<Button>(R.id.saveBtn)
-
-        saveBtn.setOnClickListener {
-            bitmap = getImageOfView(editImageBinding.imagePreview)
-            if (bitmap != null) {
-                saveImageToGallery(bitmap!!)
+        saveBtn?.setOnClickListener {
+            val combinedBitmap = combineImageAndText(imagePreview.drawable, editText.text.toString())
+            if (combinedBitmap != null) {
+                saveImageToGallery(combinedBitmap)
             }
             onBackPressed()
             val intent = Intent(this, GalleryActivity::class.java)
@@ -136,17 +145,175 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         }
     }
 
-    private fun getImageOfView(imageView: ImageView): Bitmap? {
-        var image: Bitmap? = null
-        try {
-            image = Bitmap.createBitmap(editImageBinding.imagePreview.measuredWidth, editImageBinding.imagePreview.measuredHeight, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(image)
-            imageView.draw(canvas)
-        } catch (e: java.lang.Exception){
-            Log.e("Cannot", "cannot capture")
+    @SuppressLint("ClickableViewAccessibility")
+    private fun myText() {
+
+        val textBtnsLayout = findViewById<ConstraintLayout>(R.id.textBtnsLayout)
+        textBtnsLayout.visibility=View.VISIBLE
+        editText.visibility= View.VISIBLE
+
+        val fonts = findViewById<TextView>(R.id.fonts)
+        val colorText = findViewById<TextView>(R.id.colorText)
+        val fontsTextLayout = findViewById<LinearLayout>(R.id.fontsTextLayout)
+        val colorTextLayout = findViewById<LinearLayout>(R.id.colorLinearLayout)
+        val colorToolsLayout = findViewById<HorizontalScrollView>(R.id.colorToolsLayout)
+
+        val textColorWhite = findViewById<ImageView>(R.id.textColorWhite)
+        val textColorBlack = findViewById<ImageView>(R.id.textColorBlack)
+        val textColorRed = findViewById<ImageView>(R.id.textColorRed)
+        val textColorGreen = findViewById<ImageView>(R.id.textColorGreen)
+        val textColorBlue = findViewById<ImageView>(R.id.textColorBlue)
+        val textColorPurple = findViewById<ImageView>(R.id.textColorPurple)
+
+        val textFont_1 = findViewById<ImageView>(R.id.textFont_1)
+        val textFont_2 = findViewById<ImageView>(R.id.textFont_2)
+        val textFont_3 = findViewById<ImageView>(R.id.textFont_3)
+
+        var isMoving = false
+        var previousX = 0f
+        var previousY = 0f
+
+        handleTextViewClick(colorText)
+        linearLayoutVisible(colorTextLayout)
+
+        editText.setOnTouchListener { _, motionEvent ->
+            editText.requestFocus()
+            false
         }
-        return image
+        imagePreview.setOnTouchListener { view, motionEvent ->
+            val imageRect = Rect()
+            imagePreview.getGlobalVisibleRect(imageRect)
+
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    isMoving = true
+                    previousX = motionEvent.rawX
+                    previousY = motionEvent.rawY
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (isMoving) {
+                        val dx = motionEvent.rawX - previousX
+                        val dy = motionEvent.rawY - previousY
+                        val newX = editText.x + dx
+                        val newY = editText.y + dy
+
+                        val newRect = Rect(
+                            newX.toInt(),
+                            newY.toInt(),
+                            (newX + editText.width).toInt(),
+                            (newY + editText.height).toInt()
+                        )
+
+                        val imageDrawable = imagePreview.drawable
+                        val imageWidth = imageDrawable.intrinsicWidth
+                        val imageHeight = imageDrawable.intrinsicHeight
+
+                        val imageViewWidth = imagePreview.width
+                        val imageViewHeight = imagePreview.height
+
+                        val scaleFactorX = imageViewWidth.toFloat() / imageWidth.toFloat()
+                        val scaleFactorY = imageViewHeight.toFloat() / imageHeight.toFloat()
+
+                        val scale = if (scaleFactorX > scaleFactorY) scaleFactorY else scaleFactorX
+
+                        val scaledImageWidth = (imageWidth * scale).toInt()
+                        val scaledImageHeight = (imageHeight * scale).toInt()
+
+                        val imageRect = Rect(
+                            (imagePreview.x + (imageViewWidth - scaledImageWidth) / 2).toInt(),
+                            (imagePreview.y + (imageViewHeight - scaledImageHeight) / 2).toInt(),
+                            (imagePreview.x + (imageViewWidth + scaledImageWidth) / 2).toInt(),
+                            (imagePreview.y + (imageViewHeight + scaledImageHeight) / 2).toInt()
+                        )
+
+                        if (imageRect.contains(newRect)) {
+                            editText.x = newX
+                            editText.y = newY
+                            previousX = motionEvent.rawX
+                            previousY = motionEvent.rawY
+                        }
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    isMoving = false
+                    true
+                }
+                else -> false
+            }
+        }
+        colorText.setOnClickListener {
+            handleTextViewClick(colorText)
+            linearLayoutVisible(colorTextLayout)
+            colorToolsLayout.visibility = View.VISIBLE
+        }
+        textColorWhite.setOnClickListener{
+            editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
+        }
+        textColorBlack.setOnClickListener {
+            editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.black))
+        }
+        textColorRed.setOnClickListener {
+            editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.red))
+        }
+        textColorGreen.setOnClickListener {
+            editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.green))
+        }
+        textColorBlue.setOnClickListener {
+            editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.blue))
+        }
+        textColorPurple.setOnClickListener {
+            editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.purple_200))
+        }
+        val typeface = ResourcesCompat.getFont(this, R.font.nevduplenysh_regular)
+        fonts.setOnClickListener {
+
+            val bitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+
+            val paint = Paint()
+            paint.typeface = typeface
+            paint.textSize = 48f
+            paint.color = Color.BLACK
+
+            canvas.drawText("Abcd", 25f, 120f, paint)
+
+            textFont_1.setImageBitmap(bitmap)
+
+            handleTextViewClick(fonts)
+            linearLayoutVisible(fontsTextLayout!!)
+            colorToolsLayout.visibility = View.GONE
+        }
+        textFont_1.setOnClickListener {
+            editText.typeface = typeface
+        }
     }
+    fun combineImageAndText(imageDrawable: Drawable, text: String): Bitmap? {
+        val imageBitmap = (imageDrawable as BitmapDrawable).bitmap
+
+        val scaleFactorX = imageBitmap.width.toFloat() / imagePreview.width.toFloat()
+        val scaleFactorY = imageBitmap.height.toFloat() / imagePreview.height.toFloat()
+        val scale = if (scaleFactorX > scaleFactorY) scaleFactorY else scaleFactorX
+
+        val textX = (editText.x - imagePreview.x) * scale + (imageBitmap.width - imagePreview.width * scale) / 2f
+        val textY = (editText.y - imagePreview.y) * scale + (imageBitmap.height - imagePreview.height * scale) / 2f + editText.textSize / 2f
+
+        val combinedBitmap = Bitmap.createBitmap(imageBitmap.width, imageBitmap.height, Bitmap.Config.ARGB_8888)
+
+        val canvas = Canvas(combinedBitmap)
+        canvas.drawBitmap(imageBitmap, 0f, 0f, null)
+
+        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        textPaint.color = editText.currentTextColor
+        textPaint.textSize = editText.textSize * scale
+        textPaint.setTypeface(editText.typeface)
+
+        canvas.drawText(text, textX, textY, textPaint)
+
+        return combinedBitmap
+    }
+
     fun saveImageToGallery(bitmap: Bitmap) {
         val imageName = "photofocus_${System.currentTimeMillis()}.jpg"
         var fos: OutputStream? = null
@@ -178,8 +345,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         cropTools = findViewById(R.id.cropBtnsLayout)
         cropping = findViewById(R.id.cropping)
 
-        val fixcropping = findViewById<TextView>(R.id.fixcropping)
-
+        val   fixcropping = findViewById<TextView>(R.id.fixcropping)
         val fixCropLayout = findViewById<LinearLayout>(R.id.fixCropLayout)
         val cropOriginal = findViewById<TextView>(R.id.cropOriginal)
         val crop11 = findViewById<TextView>(R.id.crop1_1)
@@ -200,30 +366,29 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         editImageBinding.cropImageView.setImageBitmap(bitmap)
         editImageBinding.imagePreview.setImageResource(0)
 
-        selectedLinearLayout = fixCropLayout
         handleTextViewClick(fixcropping)
 
         fixcropping.setOnClickListener {
             handleTextViewClick(fixcropping)
             linearLayoutVisible(fixCropLayout)
-            cropOriginal.setOnClickListener {
-                editImageBinding.cropImageView.setFixedAspectRatio(false)
-            }
-            crop11.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(1, 1)
-            }
-            crop12.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(1, 2)
-            }
-            crop169.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(16, 9)
-            }
-            crop43.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(4, 3)
-            }
-            crop31.setOnClickListener {
-                editImageBinding.cropImageView.setAspectRatio(3, 1)
-            }
+        }
+        cropOriginal.setOnClickListener {
+            editImageBinding.cropImageView.setFixedAspectRatio(false)
+        }
+        crop11.setOnClickListener {
+            editImageBinding.cropImageView.setAspectRatio(1, 1)
+        }
+        crop12.setOnClickListener {
+            editImageBinding.cropImageView.setAspectRatio(1, 2)
+        }
+        crop169.setOnClickListener {
+            editImageBinding.cropImageView.setAspectRatio(16, 9)
+        }
+        crop43.setOnClickListener {
+            editImageBinding.cropImageView.setAspectRatio(4, 3)
+        }
+        crop31.setOnClickListener {
+            editImageBinding.cropImageView.setAspectRatio(3, 1)
         }
 
         cropping!!.setOnClickListener {
@@ -235,18 +400,18 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         rotation!!.setOnClickListener {
             handleTextViewClick(rotation!!)
             linearLayoutVisible(rotationLayout)
-            leftRotation.setOnClickListener {
-                editImageBinding.cropImageView.rotateImage(-90)
-            }
-            rightRotation.setOnClickListener {
-                editImageBinding.cropImageView.rotateImage(90)
-            }
-            flipHor.setOnClickListener {
-                editImageBinding.cropImageView.flipImageHorizontally()
-            }
-            flipVert.setOnClickListener {
-                editImageBinding.cropImageView.flipImageVertically()
-            }
+        }
+        leftRotation.setOnClickListener {
+            editImageBinding.cropImageView.rotateImage(-90)
+        }
+        rightRotation.setOnClickListener {
+            editImageBinding.cropImageView.rotateImage(90)
+        }
+        flipHor.setOnClickListener {
+            editImageBinding.cropImageView.flipImageHorizontally()
+        }
+        flipVert.setOnClickListener {
+            editImageBinding.cropImageView.flipImageVertically()
         }
         backBtn!!.setOnClickListener{
             onBackPressed()

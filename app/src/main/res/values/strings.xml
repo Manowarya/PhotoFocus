@@ -34,4 +34,6 @@
     <string name="_0">0</string>
     <string name="back">back</string>
     <string name="sign_in">Войти</string>
+    <string name="color_text">Цвет текста</string>
+    <string name="font">Шрифты</string>
 </resources>
