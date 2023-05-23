@@ -8,6 +8,7 @@ import (
 	_ "github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	_ "github.com/labstack/echo/middleware"
+	_ "net/http"
 )
 
 func main() {
@@ -20,6 +21,9 @@ func main() {
 	e.Use(middleware.Recover())
 
 	e.GET("/fetch-values", routes.GetTemplate(db))
+	e.POST("/verification", routes.VerificationEmail(db))
+	e.POST("/register", routes.RegisterUser(db))
+	e.POST("/authorization", routes.AuthorizationUser(db))
 
 	e.Start(":9000")
 }

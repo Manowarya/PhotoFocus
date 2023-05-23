@@ -2,17 +2,18 @@ package model
 
 import (
 	"database/sql"
+	"github.com/labstack/echo"
+	"net/http"
 )
 
 type User struct {
-	ID       int64  `json:"id"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type Template struct {
 	ID        int64   `json:"id"`
-	UserId    int64   `json:"id"`
+	UserId    int64   `json:"user_id"`
 	Text      string  `json:"text"`
 	FontSize  int64   `json:"font_size"`
 	TextColor string  `json:"text_color"`
@@ -61,4 +62,17 @@ func GetTemplates(db *sql.DB, userId string) (Templates, error) {
 	}
 
 	return templates, err
+}
+
+func CreateUser(c echo.Context) error {
+	user := new(User)
+	if err := c.Bind(user); err != nil {
+		return err
+	}
+
+	createdUser := &User{
+		Password: user.Password,
+	}
+
+	return c.JSON(http.StatusCreated, createdUser)
 }

@@ -19,8 +19,8 @@ func Migrate(db *sql.DB) {
 	userSql := `
         CREATE TABLE IF NOT EXISTS users(
 			id INT PRIMARY KEY AUTO_INCREMENT,
-			Email VARCHAR(50) UNIQUE NOT NULL,
-			Password VARCHAR(30) NOT NULL
+			email VARCHAR(50) UNIQUE NOT NULL,
+			password VARCHAR(70) NOT NULL
         );
     `
 	_, err := db.Exec(userSql)
