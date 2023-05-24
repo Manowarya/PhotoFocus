@@ -21,6 +21,7 @@ func main() {
 	e.Use(middleware.Recover())
 
 	e.GET("/fetch-values", routes.GetTemplate(db))
+	e.POST("/save-template", routes.SaveTemplate(db))
 	e.POST("/verification", routes.VerificationEmail(db))
 	e.POST("/register", routes.RegisterUser(db))
 	e.POST("/authorization", routes.AuthorizationUser(db))

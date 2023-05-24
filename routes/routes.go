@@ -46,6 +46,16 @@ func GetTemplate(db *sql.DB) echo.HandlerFunc {
 	}
 }
 
+func SaveTemplate(db *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if err := model.SaveTemplate(db, c); err != nil {
+			return c.JSON(http.StatusBadGateway, "Ошибка сервера, попробуйте позже")
+
+		}
+		return c.JSON(http.StatusCreated, "Шаблон успешно создан")
+	}
+}
+
 func VerificationEmail(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := new(model.User)

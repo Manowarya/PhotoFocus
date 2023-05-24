@@ -64,6 +64,18 @@ func GetTemplates(db *sql.DB, userId string) (Templates, error) {
 	return templates, err
 }
 
+func SaveTemplate(db *sql.DB, c echo.Context) error {
+	template := new(Template)
+	if err := c.Bind(template); err != nil {
+		return err
+	}
+
+	insertQuery := "INSERT INTO templates (user_id, text, font_size, text_color, font, light, bokeh, color, grain, vignette) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	_, err := db.Exec(insertQuery, template.UserId, template.Text, template.FontSize, template.TextColor, template.Font, template.Light, template.Bokeh, template.Color, template.Grain, template.Vignette)
+
+	return err
+}
+
 func CreateUser(c echo.Context) error {
 	user := new(User)
 	if err := c.Bind(user); err != nil {
