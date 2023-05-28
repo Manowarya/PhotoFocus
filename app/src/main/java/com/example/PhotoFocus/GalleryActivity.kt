@@ -48,7 +48,7 @@ class GalleryActivity : AppCompatActivity() {
             MediaStore.Images.ImageColumns.DATA,
             MediaStore.Images.Media.DISPLAY_NAME
         )
-        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC" // Сортировка по убыванию даты
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
         val cursor = this@GalleryActivity.contentResolver.query(
             allImageUri,
             projection,

@@ -100,6 +100,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         dstBitmap = bitmap!!.copy(bitmap!!.config, true)
 
+        imagePreview.setImageBitmap(dstBitmap)
+
         toolsLayout = findViewById(R.id.toolsLayout)
 
         editImageBinding.cropBtn.setOnClickListener {
@@ -490,7 +492,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         saveBtn!!.visibility = View.GONE
         cropTools!!.visibility = View.VISIBLE
-        editImageBinding.cropImageView.setImageBitmap(bitmap)
+        editImageBinding.cropImageView.setImageBitmap(dstBitmap)
         editImageBinding.imagePreview.setImageResource(0)
 
         handleTextViewClick(fixcropping)
