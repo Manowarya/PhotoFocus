@@ -42,20 +42,32 @@ class GalleryActivity : AppCompatActivity() {
     }
 
     private fun getAllImages(): ArrayList<Image>? {
-        val images=ArrayList<Image>()
+        val images = ArrayList<Image>()
         val allImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(MediaStore.Images.ImageColumns.DATA, MediaStore.Images.Media.DISPLAY_NAME)
-        val cursor=this@GalleryActivity.contentResolver.query(allImageUri, projection, null, null, null)
+        val projection = arrayOf(
+            MediaStore.Images.ImageColumns.DATA,
+            MediaStore.Images.Media.DISPLAY_NAME
+        )
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC" // Сортировка по убыванию даты
+        val cursor = this@GalleryActivity.contentResolver.query(
+            allImageUri,
+            projection,
+            null,
+            null,
+            sortOrder
+        )
         try {
-            cursor!!.moveToFirst()
+            cursor?.moveToFirst()
             do {
-                val image=Image()
-                image.imagePath=cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
+                val image = Image()
+                image.imagePath =
+                    cursor?.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
                 images.add(image)
-            }while (cursor.moveToNext())
-            cursor.close()
-        }catch (e:java.lang.Exception){
+            } while (cursor?.moveToNext() == true)
+        } catch (e: Exception) {
             e.printStackTrace()
+        } finally {
+            cursor?.close()
         }
         return images
     }
