@@ -98,9 +98,11 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         bitmap = (imagePreview.drawable as BitmapDrawable).bitmap
 
+
         dstBitmap = bitmap!!.copy(bitmap!!.config, true)
 
         imagePreview.setImageBitmap(dstBitmap)
+
 
         toolsLayout = findViewById(R.id.toolsLayout)
 
@@ -184,7 +186,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         saveBtn = findViewById(R.id.saveBtn)
         saveBtn?.setOnClickListener {
-            val combinedBitmap = combineImageAndText(imagePreview.drawable, editText.text.toString())
+            val combinedBitmap = combineImageAndText(dstBitmap!!, editText)
             if (combinedBitmap != null) {
                 saveImageToGallery(combinedBitmap)
             }
@@ -416,32 +418,70 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         image.setImageBitmap(bitmapFont)
     }
 
-    fun combineImageAndText(imageDrawable: Drawable, text: String): Bitmap? {
-        val imageBitmap = (imageDrawable as BitmapDrawable).bitmap
+    fun combineImageAndText(bitmap: Bitmap, editText: EditText): Bitmap? {
+        val resultBitmap = bitmap.copy(bitmap.config, true)
+        val canvas = Canvas(resultBitmap)
 
-        val scaleFactorX = imageBitmap.width.toFloat() / imagePreview.width.toFloat()
-        val scaleFactorY = imageBitmap.height.toFloat() / imagePreview.height.toFloat()
-        val scale = if (scaleFactorX > scaleFactorY) scaleFactorY else scaleFactorX
+        val text = editText.text.toString()
+        val textSize = editText.textSize
+        val textColor = editText.currentTextColor
+        val textPaddingLeft = editText.paddingLeft
+        val textPaddingTop = editText.paddingTop
 
-        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        textPaint.color = editText.currentTextColor
-        textPaint.textSize = editText.textSize * scale
-        textPaint.typeface = editText.typeface
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.textSize = textSize
+        paint.color = textColor
 
         val textBounds = Rect()
-        textPaint.getTextBounds(text, 0, text.length, textBounds)
+        paint.getTextBounds(text, 0, text.length, textBounds)
 
-        val textX = (editText.x - imagePreview.x) * scale + (imageBitmap.width - imagePreview.width * scale) / 2f
-        val textY = (editText.y - imagePreview.y) * scale + (imageBitmap.height - imagePreview.height * scale) / 2f - textBounds.height()
+        val x = editText.x - textPaddingLeft
+        val y = editText.y - textPaddingTop + textBounds.height()
 
-        val combinedBitmap = Bitmap.createBitmap(imageBitmap.width, imageBitmap.height, Bitmap.Config.ARGB_8888)
+        val imageDrawable = imagePreview.drawable
+        val imageWidth = imageDrawable.intrinsicWidth
+        val imageHeight = imageDrawable.intrinsicHeight
 
-        val canvas = Canvas(combinedBitmap)
-        canvas.drawBitmap(imageBitmap, 0f, 0f, null)
+        val imageViewWidth = imagePreview.width
+        val imageViewHeight = imagePreview.height
 
-        canvas.drawText(text, textX, textY, textPaint)
+        val scaleFactorX = imageViewWidth.toFloat() / imageWidth.toFloat()
+        val scaleFactorY = imageViewHeight.toFloat() / imageHeight.toFloat()
 
-        return combinedBitmap
+        val scale = if (scaleFactorX > scaleFactorY) scaleFactorY else scaleFactorX
+
+        val scaledImageWidth = (imageWidth * scale).toInt()
+        val scaledImageHeight = (imageHeight * scale).toInt()
+
+        val imageRect = Rect(
+            (imagePreview.x + (imageViewWidth - scaledImageWidth) / 2).toInt(),
+            (imagePreview.y + (imageViewHeight - scaledImageHeight) / 2).toInt(),
+            (imagePreview.x + (imageViewWidth + scaledImageWidth) / 2).toInt(),
+            (imagePreview.y + (imageViewHeight + scaledImageHeight) / 2).toInt()
+        )
+
+        val adjustedX = (x - imageRect.left) / scale
+        val adjustedY = (y - imageRect.top) / scale
+
+        val adjustedTextSize = textSize / scale
+        val adjustedPaddingLeft = textPaddingLeft / scale
+        val adjustedPaddingTop = textPaddingTop / scale
+
+        val adjustedPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        adjustedPaint.textSize = adjustedTextSize
+        adjustedPaint.color = textColor
+
+        val adjustedTextBounds = Rect()
+        adjustedPaint.getTextBounds(text, 0, text.length, adjustedTextBounds)
+
+        val adjustedXWithPadding = adjustedX + adjustedPaddingLeft
+        val adjustedYWithPadding = adjustedY + adjustedPaddingTop + adjustedTextBounds.height()
+
+        val adjustedYCorrection = adjustedTextBounds.height() - adjustedPaint.fontMetrics.descent
+        val adjustedYWithPaddingCorrection = adjustedYWithPadding - adjustedYCorrection
+
+        canvas.drawText(text, adjustedXWithPadding, adjustedYWithPaddingCorrection, adjustedPaint)
+        return resultBitmap
     }
 
     fun saveImageToGallery(bitmap: Bitmap) {
@@ -817,8 +857,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                     rotation!!.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
                     cropping!!.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
                     cropTools!!.visibility = View.GONE
-                    bitmap = editImageBinding.cropImageView.getCroppedImage()!!
-                    editImageBinding.imagePreview.setImageBitmap(bitmap)
+                    dstBitmap = editImageBinding.cropImageView.getCroppedImage()!!
+                    editImageBinding.imagePreview.setImageBitmap(dstBitmap)
                     editImageBinding.cropImageView.clearImage()
                 }
                 "correction" -> {

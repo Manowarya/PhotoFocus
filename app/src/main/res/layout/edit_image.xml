@@ -59,40 +59,32 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/imageCard"
+    <ImageView
+        android:id="@+id/imagePreview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_gravity="center"
         android:layout_margin="@dimen/_20sdp"
-        app:cardBackgroundColor="@color/gray"
-        app:cardElevation="0dp"
-        app:layout_constraintDimensionRatio="9:13"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appbar"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/editToolsWrapper"
-        app:layout_constraintStart_toStartOf="parent" >
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appbar" />
 
-        <ImageView
-            android:id="@+id/imagePreview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="visible" />
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:hint="@string/enter_text"
+        android:inputType="text"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imagePreview"
+        app:layout_constraintEnd_toEndOf="@+id/imagePreview"
+        app:layout_constraintStart_toStartOf="@+id/imagePreview"
+        app:layout_constraintTop_toTopOf="@+id/imagePreview" />
 
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:hint="@string/enter_text"
-            android:inputType="text"
-            android:textSize="25sp"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            />
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.canhub.cropper.CropImageView
+        <com.canhub.cropper.CropImageView
         android:id="@+id/cropImageView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -101,6 +93,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appbar" />
+
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/editToolsWrapper"
