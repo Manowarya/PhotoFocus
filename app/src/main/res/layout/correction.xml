@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    android:visibility="gone"
+
 >
 
     <HorizontalScrollView
@@ -119,8 +119,11 @@
         <SeekBar
             android:id="@+id/toneSeekBar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_12sdp">
-
+            android:layout_height="@dimen/_12sdp"
+            android:maxHeight="2dp"
+            android:thumbTint="@color/button"
+            android:progressDrawable="@drawable/gradient_seekbar_progress_rainbow"
+            >
         </SeekBar>
 
         <LinearLayout
@@ -152,6 +155,9 @@
             android:id="@+id/saturationSeekBar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_12sdp"
+            android:thumbTint="@color/button"
+            android:maxHeight="2dp"
+            android:progressDrawable="@drawable/gradient_seekbar_progress"
             app:layout_constraintTop_toBottomOf="@+id/tone">
 
         </SeekBar>
@@ -186,6 +192,9 @@
             android:id="@+id/brightSeekBar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_12sdp"
+            android:thumbTint="@color/button"
+            android:maxHeight="2dp"
+            android:progressDrawable="@drawable/gradient_seekbar_progress"
             app:layout_constraintTop_toBottomOf="@+id/saturation">
 
         </SeekBar>

@@ -1,0 +1,8 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <!-- Здесь вы можете использовать изображение в качестве фона полоски -->
+        <bitmap
+            android:src="@drawable/gradient"
+            android:tileMode="repeat" />
+    </item>
+</layer-list>

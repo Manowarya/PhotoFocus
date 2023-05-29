@@ -79,6 +79,7 @@
         android:hint="@string/enter_text"
         android:inputType="text"
         android:textSize="25sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/imagePreview"
         app:layout_constraintEnd_toEndOf="@+id/imagePreview"
         app:layout_constraintStart_toStartOf="@+id/imagePreview"
