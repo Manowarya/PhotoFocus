@@ -1,16 +1,14 @@
 #include <jni.h>
 #include <string>
-#include "opencv-utils.h"
 #include <android/bitmap.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-
-using namespace cv;
+#include "opencv-utils.h"
 
 void bitmapToMat(JNIEnv *env, jobject bitmap, Mat& dst, jboolean needUnPremultiplyAlpha)
 {
     AndroidBitmapInfo  info;
-    void*              pixels = 0;
+    void*              pixels = nullptr;
 
     try {
         CV_Assert( AndroidBitmap_getInfo(env, bitmap, &info) >= 0 );
@@ -39,10 +37,10 @@ void bitmapToMat(JNIEnv *env, jobject bitmap, Mat& dst, jboolean needUnPremultip
     }
 }
 
-void matToBitmap(JNIEnv* env, Mat src, jobject bitmap, jboolean needPremultiplyAlpha)
+void matToBitmap(JNIEnv* env, const Mat& src, jobject bitmap, jboolean needPremultiplyAlpha)
 {
     AndroidBitmapInfo  info;
-    void*              pixels = 0;
+    void*              pixels = nullptr;
 
     try {
         CV_Assert( AndroidBitmap_getInfo(env, bitmap, &info) >= 0 );
@@ -87,25 +85,97 @@ void matToBitmap(JNIEnv* env, Mat src, jobject bitmap, jboolean needPremultiplyA
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_example_opencv2_MainActivity_stringFromJNI(
-        JNIEnv* env,
+Java_com_example_PhotoFocus_EditImageActivity_stringFromJNI(
+        JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_opencv2_MainActivity_myFlip(JNIEnv* env, jobject, jobject bitmapIn, jobject bitmapOut) {
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myBlur(JNIEnv *env, jobject, jobject bitmap_in,
+                                                   jobject bitmap_out, jfloat sigma) {
     Mat src;
-    bitmapToMat(env, bitmapIn, src, false);
-    myFlip(src);
-    matToBitmap(env, src, bitmapOut, false);
+    bitmapToMat(env, bitmap_in, src, false);
+    myBlur(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_opencv2_MainActivity_myBlur(JNIEnv* env, jobject, jobject bitmapIn, jobject bitmapOut, jfloat sigma) {
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myNoise(JNIEnv *env, jobject, jobject bitmap_in,
+                                                     jobject bitmap_out, jfloat sigma) {
     Mat src;
-    bitmapToMat(env, bitmapIn, src, false);
-    myBlur(src, sigma);
-    matToBitmap(env, src, bitmapOut, false);
+    bitmapToMat(env, bitmap_in, src, false);
+    myNoise(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myTone(JNIEnv *env, jobject, jobject bitmap_in,
+                                                     jobject bitmap_out, jfloat sigma) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    myTone(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_mySaturation(JNIEnv *env, jobject, jobject bitmap_in,
+                                                       jobject bitmap_out, jfloat sigma) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    mySaturation(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myBright(JNIEnv *env, jobject, jobject bitmap_in,
+                                                      jobject bitmap_out, jfloat sigma) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    myBright(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myExposition(JNIEnv *env, jobject, jobject bitmap_in,
+                                                       jobject bitmap_out, jfloat sigma) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    myExposition(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myContrast(JNIEnv *env, jobject, jobject bitmap_in,
+                                                           jobject bitmap_out, jfloat sigma) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    myContrast(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myVignette(JNIEnv *env, jobject, jobject bitmap_in,
+                                                         jobject bitmap_out, jfloat sigma) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    myVignette(src, sigma);
+    matToBitmap(env, src, bitmap_out, false);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_PhotoFocus_EditImageActivity_myAutocorrect(JNIEnv *env, jobject, jobject bitmap_in,
+                                                         jobject bitmap_out) {
+    Mat src;
+    bitmapToMat(env, bitmap_in, src, false);
+    myAutocorrect(src);
+    matToBitmap(env, src, bitmap_out, false);
 }
