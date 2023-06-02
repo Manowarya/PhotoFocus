@@ -15,16 +15,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background"/>
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="@dimen/_60sdp"
+        android:gravity="center">
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLoad"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_45sdp"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="@dimen/_30sdp"
-        android:layout_marginEnd="@dimen/_30sdp"
-        android:layout_marginBottom="@dimen/_4sdp"
-        android:text="@string/load"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:text="@string/sign_in_guest"
         android:textColor="@color/white"
         android:textSize="@dimen/_16sdp"
         style="@style/Widget.Material3.Button.OutlinedButton"
@@ -34,4 +37,33 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="16dp" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSignIn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_45sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:text="@string/Sign_in"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_16sdp"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        app:strokeColor="@color/button"
+        app:cornerRadius="@dimen/_20sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/appCompatImageView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRegistration"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_45sdp"
+        android:text="@string/create_acc"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_16sdp"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        app:strokeColor="@color/button"
+        app:cornerRadius="@dimen/_20sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/appCompatImageView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="16dp" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

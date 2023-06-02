@@ -5,9 +5,11 @@ import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.MediaStore
+import android.widget.Button
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.GridLayoutManager
 
@@ -15,6 +17,8 @@ class GalleryActivity : AppCompatActivity() {
 
     private var imageRecycler:RecyclerView?=null
     private var allPictures:ArrayList<Image>?=null
+
+    private var signIn: Button? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
@@ -38,6 +42,11 @@ class GalleryActivity : AppCompatActivity() {
             allPictures=getAllImages()
 
             imageRecycler?.adapter=GalleryAdapter(this, allPictures!!)
+        }
+        signIn = findViewById(R.id.btnSignInGallery)
+        signIn!!.setOnClickListener {
+            val intent = Intent(this, Authorization::class.java)
+            startActivity(intent)
         }
     }
 

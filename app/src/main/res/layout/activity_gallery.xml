@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <Button
-            android:id="@+id/backBtn"
+            android:id="@+id/btnSignInGallery"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
@@ -24,6 +24,7 @@
             android:layout_marginBottom="@dimen/_4sdp"
             android:backgroundTint="@color/gray"
             android:minHeight="48dp"
+            android:stateListAnimator="@null"
             android:text="@string/sign_in"
             android:contentDescription="@string/back" />
     </androidx.appcompat.widget.Toolbar>
