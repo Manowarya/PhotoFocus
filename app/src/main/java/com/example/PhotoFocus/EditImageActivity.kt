@@ -205,11 +205,10 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         saveBtn = findViewById(R.id.saveBtn)
         saveBtn?.setOnClickListener {
-            dstBitmap = scaleBitmap(dstBitmap!!, originalWidth, originalHeight)
-            val combinedBitmap = combineImageAndText(dstBitmap!!, editText)
-            if (combinedBitmap != null) {
-                saveImageToGallery(combinedBitmap)
-            }
+           //dstBitmap = scaleBitmap(dstBitmap!!, originalWidth, originalHeight)
+            var combinedBitmap = combineImageAndText(dstBitmap!!, editText)
+            combinedBitmap = scaleBitmap(combinedBitmap!!, originalWidth, originalHeight)
+            saveImageToGallery(combinedBitmap)
             val intent = Intent(this, GalleryActivity::class.java)
             startActivity(intent)
         }
@@ -890,10 +889,9 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         saveBtn.setOnClickListener {
             dstBitmap = scaleBitmap(dstBitmap!!, originalWidth, originalHeight)
-            val combinedBitmap = combineImageAndText(dstBitmap!!, editText)
-            if (combinedBitmap != null) {
-                saveImageToGallery(combinedBitmap)
-            }
+            var combinedBitmap = combineImageAndText(dstBitmap!!, editText)
+            combinedBitmap = scaleBitmap(combinedBitmap!!, originalWidth, originalHeight)
+            saveImageToGallery(combinedBitmap)
             val intent = Intent(this, GalleryActivity::class.java)
             startActivity(intent)
             dialog.dismiss()
