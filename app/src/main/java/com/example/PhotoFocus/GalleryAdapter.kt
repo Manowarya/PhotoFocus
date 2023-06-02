@@ -38,6 +38,5 @@ class GalleryAdapter(private var context: Context, private var imagesList: Array
             intent.putExtra("path", currentImage.imagePath)
             context.startActivity(intent)
         }
-
     }
 }

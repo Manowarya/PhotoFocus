@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -21,11 +22,16 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.example.PhotoFocus.databinding.EditImageBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.lang.Float.max
+import java.lang.Float.min
 
 class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, TextWatcher {
     companion object {
@@ -81,6 +87,10 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
     private lateinit var imagePreview: ImageView
     private lateinit var editText: EditText
+
+    var originalWidth = 0
+    var originalHeight = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         editImageBinding = EditImageBinding.inflate(layoutInflater)
@@ -91,17 +101,27 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         imagePreview = findViewById(R.id.imagePreview)
 
-        imagePreview.setImageURI(Uri.parse(imagePath))
+        Glide.with(this)
+            .asBitmap()
+            .load(imagePath)
+            .apply(RequestOptions().centerInside())
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    originalWidth = resource.width
+                    originalHeight = resource.height
+                    val maxWidth = imagePreview.width
+                    val maxHeight = imagePreview.height
+                    val scaledBitmap = scaleBitmap(resource, maxWidth, maxHeight)
 
-        imagePreview.visibility = View.VISIBLE
+                    imagePreview.visibility = View.VISIBLE
+                    imagePreview.setImageBitmap(scaledBitmap)
+                    bitmap = scaledBitmap.copy(scaledBitmap.config, true)
+                    dstBitmap = bitmap?.copy(bitmap?.config, true)
+                }
 
-        bitmap = (imagePreview.drawable as BitmapDrawable).bitmap
-
-
-        dstBitmap = bitmap!!.copy(bitmap!!.config, true)
-
-        imagePreview.setImageBitmap(dstBitmap)
-
+                override fun onLoadCleared(placeholder: Drawable?) {
+                                  }
+            })
 
         toolsLayout = findViewById(R.id.toolsLayout)
 
@@ -185,14 +205,26 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         saveBtn = findViewById(R.id.saveBtn)
         saveBtn?.setOnClickListener {
-            val combinedBitmap = combineImageAndText(dstBitmap!!, editText)
-            if (combinedBitmap != null) {
-                saveImageToGallery(combinedBitmap)
-            }
+           //dstBitmap = scaleBitmap(dstBitmap!!, originalWidth, originalHeight)
+            var combinedBitmap = combineImageAndText(dstBitmap!!, editText)
+            combinedBitmap = scaleBitmap(combinedBitmap!!, originalWidth, originalHeight)
+            saveImageToGallery(combinedBitmap)
             val intent = Intent(this, GalleryActivity::class.java)
             startActivity(intent)
         }
     }
+    private fun scaleBitmap(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+        val scaleFactor = min(
+            maxWidth.toFloat() / bitmap.width,
+            maxHeight.toFloat() / bitmap.height
+        )
+
+        val newWidth = (bitmap.width * scaleFactor).toInt()
+        val newHeight = (bitmap.height * scaleFactor).toInt()
+
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+    }
+
     private fun templates() {
         saveBtn!!.visibility=View.GONE
         templatesBtnsLayout = findViewById(R.id.templatesBtnsLayout)
@@ -856,10 +888,10 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val dontSaveBtn = dialogView.findViewById<Button>(R.id.dialog_dontSaveBtn)
 
         saveBtn.setOnClickListener {
-            val combinedBitmap = combineImageAndText(dstBitmap!!, editText)
-            if (combinedBitmap != null) {
-                saveImageToGallery(combinedBitmap)
-            }
+            dstBitmap = scaleBitmap(dstBitmap!!, originalWidth, originalHeight)
+            var combinedBitmap = combineImageAndText(dstBitmap!!, editText)
+            combinedBitmap = scaleBitmap(combinedBitmap!!, originalWidth, originalHeight)
+            saveImageToGallery(combinedBitmap)
             val intent = Intent(this, GalleryActivity::class.java)
             startActivity(intent)
             dialog.dismiss()
