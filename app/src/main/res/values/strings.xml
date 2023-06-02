@@ -38,4 +38,5 @@
     <string name="font">Шрифты</string>
     <string name="enter_text">Enter text</string>
     <string name="user_templates">Пользовательские шаблоны</string>
+    <string name="no">Нет</string>
 </resources>

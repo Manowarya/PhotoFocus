@@ -5,7 +5,6 @@ import android.content.ContentValues
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -16,13 +15,13 @@ import android.text.*
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.example.PhotoFocus.databinding.EditImageBinding
-import com.google.android.material.card.MaterialCardView
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -190,7 +189,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             if (combinedBitmap != null) {
                 saveImageToGallery(combinedBitmap)
             }
-            onBackPressed()
             val intent = Intent(this, GalleryActivity::class.java)
             startActivity(intent)
         }
@@ -846,6 +844,35 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             ApplyEffectsTask().execute()
         }
     }
+
+    private fun showExitConfirmationDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.back_dialog, null)
+        val alertDialogBuilder = AlertDialog.Builder(this, R.style.DialogStyle)
+        alertDialogBuilder.setView(dialogView)
+
+        val dialog = alertDialogBuilder.create()
+
+        val saveBtn = dialogView.findViewById<Button>(R.id.dialog_saveBtn)
+        val dontSaveBtn = dialogView.findViewById<Button>(R.id.dialog_dontSaveBtn)
+
+        saveBtn.setOnClickListener {
+            val combinedBitmap = combineImageAndText(dstBitmap!!, editText)
+            if (combinedBitmap != null) {
+                saveImageToGallery(combinedBitmap)
+            }
+            val intent = Intent(this, GalleryActivity::class.java)
+            startActivity(intent)
+            dialog.dismiss()
+            finish()
+        }
+
+        dontSaveBtn.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+
+        dialog.show()
+    }
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (screenStack.isNotEmpty()) {
@@ -887,8 +914,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                 }
             }
         } else {
-            editImageBinding.imagePreview.setImageResource(0)
-            finish()
+            showExitConfirmationDialog()
         }
     }
 }
