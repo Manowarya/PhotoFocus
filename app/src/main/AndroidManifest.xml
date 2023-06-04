@@ -29,6 +29,9 @@
         android:theme="@style/Theme.PhotoFocus"
         tools:targetApi="31">
         <activity
+            android:name=".UserTemplates"
+            android:exported="false" />
+        <activity
             android:name=".EnterCode"
             android:exported="false" />
         <activity

@@ -760,8 +760,13 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         }
     }
     fun navigateToGallery() {
-        val intent = Intent(this, GalleryActivity::class.java)
-        intent.putExtra("screen", screen)
+        val intent: Intent?
+        if (screen == "authorization") {
+            intent = Intent(this, UserTemplates::class.java)
+        } else {
+            intent = Intent(this, GalleryActivity::class.java)
+            intent.putExtra("screen", screen)
+        }
         startActivity(intent)
     }
     fun showMessage(s: String) {
