@@ -18,6 +18,7 @@
     </queries>
 
     <application
+        android:name=".PhotoFocus"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -28,10 +29,18 @@
         android:theme="@style/Theme.PhotoFocus"
         tools:targetApi="31">
         <activity
+            android:name=".EnterCode"
+            android:exported="false" />
+        <activity
+            android:name=".Registration"
+            android:exported="false" />
+        <activity
+            android:name=".Authorization"
+            android:exported="false" />
+        <activity
             android:name=".GalleryActivity"
             android:exported="false"
-            android:theme="@style/Theme.PhotoFocus"
-            />
+            android:theme="@style/Theme.PhotoFocus" />
         <activity
             android:name=".SplashScreenActivity"
             android:exported="true"
@@ -48,9 +57,7 @@
         <activity android:name="com.canhub.cropper.CropImageActivity" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true" />
     </application>
 
 </manifest>

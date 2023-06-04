@@ -39,4 +39,16 @@
     <string name="enter_text">Enter text</string>
     <string name="user_templates">Пользовательские шаблоны</string>
     <string name="no">Нет</string>
+    <string name="sign_in_guest">Войти как гость</string>
+    <string name="Sign_in">Войти в аккаунт</string>
+    <string name="create_acc">Создать аккаунт</string>
+    <string name="registration">Регистрация</string>
+    <string name="get_code">Получить код</string>
+    <string name="register">Зарегистрироваться</string>
+    <string name="enter_code">Введите код, отправленный на указанную почту</string>
+    <string name="mail">Эл. почта</string>
+    <string name="password">Пароль</string>
+    <string name="password2">Повторите пароль</string>
+    <string name="enter_code2">Введите код</string>
+    <string name="later">Позже</string>
 </resources>
