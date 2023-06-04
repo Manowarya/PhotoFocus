@@ -32,15 +32,14 @@ func Migrate(db *sql.DB) {
     CREATE TABLE IF NOT EXISTS templates(
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		user_id INT NOT NULL,
-		text VARCHAR(100) NOT NULL, 
-		font_size INT NOT NULL,
-		text_color VARCHAR(30) NOT NULL,
-		font VARCHAR(30) NOT NULL,
-		light DOUBLE NOT NULL,
-		bokeh DOUBLE NOT NULL, 
-		color DOUBLE NOT NULL,
-		grain DOUBLE NOT NULL,
-		vignette DOUBLE NOT NULL,
+		tone FLOAT NOT NULL,
+		saturation FLOAT NOT NULL, 
+		bright FLOAT NOT NULL,
+		exposition FLOAT NOT NULL,
+		contrast FLOAT NOT NULL,
+		blur FLOAT NOT NULL,
+		noise FLOAT NOT NULL,
+		vignette FLOAT NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES users (id)
 	);
     `

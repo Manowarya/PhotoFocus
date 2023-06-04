@@ -12,17 +12,15 @@ type User struct {
 }
 
 type Template struct {
-	ID        int64   `json:"id"`
-	UserId    int64   `json:"user_id"`
-	Text      string  `json:"text"`
-	FontSize  int64   `json:"font_size"`
-	TextColor string  `json:"text_color"`
-	Font      string  `json:"font"`
-	Light     float32 `json:"light"`
-	Bokeh     float32 `json:"bokeh"`
-	Color     float32 `json:"color"`
-	Grain     float32 `json:"grain"`
-	Vignette  float32 `json:"vignette"`
+	UserId     int64   `json:"user_id"`
+	Tone       float32 `json:"tone"`
+	Saturation float32 `json:"saturation"`
+	Bright     float32 `json:"bright"`
+	Exposition float32 `json:"exposition"`
+	Contrast   float32 `json:"contrast"`
+	Blur       float32 `json:"blur"`
+	Noise      float32 `json:"noise"`
+	Vignette   float32 `json:"vignette"`
 }
 
 type Templates struct {
@@ -43,16 +41,14 @@ func GetTemplates(db *sql.DB, userId string) (Templates, error) {
 	for rows.Next() {
 		template := Template{}
 		err = rows.Scan(
-			&template.ID,
 			&template.UserId,
-			&template.Text,
-			&template.FontSize,
-			&template.TextColor,
-			&template.Font,
-			&template.Light,
-			&template.Bokeh,
-			&template.Color,
-			&template.Grain,
+			&template.Tone,
+			&template.Saturation,
+			&template.Bright,
+			&template.Exposition,
+			&template.Contrast,
+			&template.Blur,
+			&template.Noise,
 			&template.Vignette)
 		if err != nil {
 			return templates, err
@@ -70,8 +66,8 @@ func SaveTemplate(db *sql.DB, c echo.Context) error {
 		return err
 	}
 
-	insertQuery := "INSERT INTO templates (user_id, text, font_size, text_color, font, light, bokeh, color, grain, vignette) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	_, err := db.Exec(insertQuery, template.UserId, template.Text, template.FontSize, template.TextColor, template.Font, template.Light, template.Bokeh, template.Color, template.Grain, template.Vignette)
+	insertQuery := "INSERT INTO templates (user_id, text, font_size, text_color, font, light, bokeh, color, grain, vignette) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	_, err := db.Exec(insertQuery, template.UserId, template.Tone, template.Saturation, template.Bright, template.Exposition, template.Contrast, template.Blur, template.Noise, template.Vignette)
 
 	return err
 }
