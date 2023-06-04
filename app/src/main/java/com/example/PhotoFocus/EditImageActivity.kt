@@ -1,19 +1,11 @@
 package com.example.PhotoFocus
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Intent
 import android.graphics.*
-import android.graphics.drawable.Drawable
-import android.media.MediaScannerConnection
-import android.net.Uri
 import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.text.*
-import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -23,17 +15,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.example.PhotoFocus.databinding.EditImageBinding
 import com.yandex.metrica.YandexMetrica
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
 import java.lang.Float.max
-import java.lang.Float.min
 
 class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, TextWatcher {
     companion object {
@@ -41,7 +25,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             System.loadLibrary("native-lib")
         }
     }
-    private var bitmap: Bitmap? = null
     private var dstBitmap: Bitmap? = null
 
     private lateinit var editImageBinding: EditImageBinding
@@ -90,40 +73,38 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     private lateinit var imagePreview: ImageView
     private lateinit var editText: EditText
 
-    var originalWidth = 0
-    var originalHeight = 0
     var screen : String? = null
+
+    private lateinit var editImageModel: EditImageModel
+    private lateinit var textModel: TextModel
+    private lateinit var editImageController: EditImageController
+
+    private var tone: Float = 0.0F
+    private var saturation: Float = 1.0F
+    private var bright: Float = 0.0F
+    private var exposition: Float = 0.0F
+    private var contrast: Float = 0.0F
+    private var blur: Float = 0.0F
+    private var noise: Float = 0.0F
+    private var vignette: Float = 0.0F
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         editImageBinding = EditImageBinding.inflate(layoutInflater)
         supportActionBar?.hide()
         setContentView(editImageBinding.root)
 
+        editImageModel = EditImageModel(this)
+
         val imagePath = intent.getStringExtra("path")
 
         imagePreview = findViewById(R.id.imagePreview)
 
-        Glide.with(this)
-            .asBitmap()
-            .load(imagePath)
-            .apply(RequestOptions().centerInside())
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    originalWidth = resource.width
-                    originalHeight = resource.height
-                    val maxWidth = imagePreview.width
-                    val maxHeight = imagePreview.height
-                    val scaledBitmap = scaleBitmap(resource, maxWidth, maxHeight)
+        editImageModel.loadImage(imagePath.toString())
 
-                    imagePreview.visibility = View.VISIBLE
-                    imagePreview.setImageBitmap(scaledBitmap)
-                    bitmap = scaledBitmap.copy(scaledBitmap.config, true)
-                    dstBitmap = bitmap?.copy(bitmap?.config, true)
-                }
+        textModel = TextModel()
 
-                override fun onLoadCleared(placeholder: Drawable?) {
-                }
-            })
+        imagePreview.visibility = View.VISIBLE
 
         YandexMetrica.reportEvent(MetricEventNames.VISITED_EDIT_SCREEN)
 
@@ -133,8 +114,9 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         editImageBinding.cropBtn.setOnClickListener {
             YandexMetrica.reportEvent(MetricEventNames.STARTED_EDIT_IMAGE)
             screenStack.add("crop")
-            toolsLayout!!.visibility = View.GONE
             crop()
+            toolsLayout!!.visibility = View.GONE
+
         }
         editTextTone = findViewById(R.id.editTextTone)
         editTextSaturation = findViewById(R.id.editTextSaturation)
@@ -179,6 +161,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             toolsLayout!!.visibility = View.GONE
             correction()
         }
+
         val autocorrectionBtn = findViewById<TextView>(R.id.autocorrectionBtn)
 
         if (screen == "guest") {
@@ -201,8 +184,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         } else {
             autocorrectionBtn.setOnClickListener {
                 YandexMetrica.reportEvent(MetricEventNames.APPLY_AUTOCORR)
-                myAutocorrect(bitmap!!, dstBitmap!!)
-                editImageBinding.imagePreview.setImageBitmap(dstBitmap)
+                editImageController.onAutocorrectClicked()
             }
             editImageBinding.templatesBtn.setOnClickListener {
                 YandexMetrica.reportEvent(MetricEventNames.APPLY_TEMPLATES)
@@ -231,29 +213,15 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         )
 
         saveBtn = findViewById(R.id.saveBtn)
+
+        editImageController = EditImageController(this, editImageModel)
+
         saveBtn?.setOnClickListener {
-            YandexMetrica.reportEvent(MetricEventNames.SAVE_IMAGE)
-            var combinedBitmap = combineImageAndText(dstBitmap!!, editText)
-            combinedBitmap = scaleBitmap(combinedBitmap!!, originalWidth, originalHeight)
-            saveImageToGallery(combinedBitmap)
-            val intent = Intent(this, GalleryActivity::class.java)
-            intent.putExtra("screen", screen)
-            startActivity(intent)
+            val combinedBitmap = textModel.combineImageAndText(dstBitmap!!, imagePreview, editText)
+            editImageController.onSaveButtonClicked(combinedBitmap!!)
         }
     }
-    private fun scaleBitmap(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
-        val scaleFactor = min(
-            maxWidth.toFloat() / bitmap.width,
-            maxHeight.toFloat() / bitmap.height
-        )
-
-        val newWidth = (bitmap.width * scaleFactor).toInt()
-        val newHeight = (bitmap.height * scaleFactor).toInt()
-
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-    }
-
-    private fun templates() {
+  private fun templates() {
         saveBtn!!.visibility=View.GONE
         templatesBtnsLayout = findViewById(R.id.templatesBtnsLayout)
         templatesBtnsLayout!!.visibility=View.VISIBLE
@@ -269,6 +237,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         handleTextViewClick(sysTemplates!!)
         linearLayoutVisible(templatesSysLayout!!)
+
         sysTemplates!!.setOnClickListener {
             handleTextViewClick(sysTemplates!!)
             linearLayoutVisible(templatesSysLayout!!)
@@ -282,27 +251,26 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         setTextToSmallImageView(sysTemplates_3, ResourcesCompat.getFont(this, R.font.nevduplenysh_regular), "Контраст")
         sysTemplates_1.setOnClickListener {
             setDefaultSeekBar()
-            ApplyEffectsTask().execute()
+            updateCorrectionParametrs()
+            ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
         }
         sysTemplates_2.setOnClickListener {
             setDefaultSeekBar()
             saturationSeekBar?.progress = 0
             editTextSaturation?.setText((-100).toString())
-            shouldApplySaturation = true
             brightSeekBar?.progress = 0
             editTextBright?.setText((-100).toString())
-            shouldApplyBright = true
-            ApplyEffectsTask().execute()
+            updateCorrectionParametrs()
+            ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
         }
         sysTemplates_3.setOnClickListener {
             setDefaultSeekBar()
             brightSeekBar?.progress = 20
-            shouldApplyBright = true
             editTextBright?.setText((-80).toString())
             contrastSeekBar?.progress = 130
-            shouldApplyBright = true
             editTextContrast?.setText((30).toString())
-            ApplyEffectsTask().execute()
+            updateCorrectionParametrs()
+            ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
         }
         backBtn?.setOnClickListener{
             onBackPressed()
@@ -332,80 +300,17 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val textFont_2 = findViewById<ImageView>(R.id.textFont_2)
         val textFont_3 = findViewById<ImageView>(R.id.textFont_3)
 
-        var isMoving = false
-        var previousX = 0f
-        var previousY = 0f
-
         handleTextViewClick(colorText!!)
         linearLayoutVisible(colorTextLayout!!)
 
-        editText.setOnTouchListener { _, motionEvent ->
+        editText.setOnTouchListener { _, _ ->
             editText.requestFocus()
             false
         }
-        imagePreview.setOnTouchListener { view, motionEvent ->
-            val imageRect = Rect()
-            imagePreview.getGlobalVisibleRect(imageRect)
-
-            when (motionEvent.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    isMoving = true
-                    previousX = motionEvent.rawX
-                    previousY = motionEvent.rawY
-                    true
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    if (isMoving) {
-                        val dx = motionEvent.rawX - previousX
-                        val dy = motionEvent.rawY - previousY
-                        val newX = editText.x + dx
-                        val newY = editText.y + dy
-
-                        val newRect = Rect(
-                            newX.toInt(),
-                            newY.toInt(),
-                            (newX + editText.width).toInt(),
-                            (newY + editText.height).toInt()
-                        )
-
-                        val imageDrawable = imagePreview.drawable
-                        val imageWidth = imageDrawable.intrinsicWidth
-                        val imageHeight = imageDrawable.intrinsicHeight
-
-                        val imageViewWidth = imagePreview.width
-                        val imageViewHeight = imagePreview.height
-
-                        val scaleFactorX = imageViewWidth.toFloat() / imageWidth.toFloat()
-                        val scaleFactorY = imageViewHeight.toFloat() / imageHeight.toFloat()
-
-                        val scale = if (scaleFactorX > scaleFactorY) scaleFactorY else scaleFactorX
-
-                        val scaledImageWidth = (imageWidth * scale).toInt()
-                        val scaledImageHeight = (imageHeight * scale).toInt()
-
-                        val imageRect = Rect(
-                            (imagePreview.x + (imageViewWidth - scaledImageWidth) / 2).toInt(),
-                            (imagePreview.y + (imageViewHeight - scaledImageHeight) / 2).toInt(),
-                            (imagePreview.x + (imageViewWidth + scaledImageWidth) / 2).toInt(),
-                            (imagePreview.y + (imageViewHeight + scaledImageHeight) / 2).toInt()
-                        )
-
-                        if (imageRect.contains(newRect)) {
-                            editText.x = newX
-                            editText.y = newY
-                            previousX = motionEvent.rawX
-                            previousY = motionEvent.rawY
-                        }
-                    }
-                    true
-                }
-                MotionEvent.ACTION_UP -> {
-                    isMoving = false
-                    true
-                }
-                else -> false
-            }
+        imagePreview.setOnTouchListener { _, motionEvent ->
+            textModel.handleTextTouch(editText, imagePreview, motionEvent)
         }
+
         colorText!!.setOnClickListener {
             handleTextViewClick(colorText!!)
             linearLayoutVisible(colorTextLayout!!)
@@ -446,7 +351,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             onBackPressed()
         }
     }
-
     private fun setTextToSmallImageView(image: ImageView, typeface: Typeface?, text: String) { //text  не больше 8 символов
         val bitmapFont = Bitmap.createBitmap(65, 65, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmapFont)
@@ -476,102 +380,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         image.setImageBitmap(bitmapFont)
     }
 
-    fun combineImageAndText(bitmap: Bitmap, editText: EditText): Bitmap? {
-        val resultBitmap = bitmap.copy(bitmap.config, true)
-        val canvas = Canvas(resultBitmap)
-
-        val text = editText.text.toString()
-        val textSize = editText.textSize
-        val textColor = editText.currentTextColor
-        val textPaddingLeft = editText.paddingLeft
-        val textPaddingTop = editText.paddingTop
-
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.textSize = textSize
-        paint.color = textColor
-
-        val textBounds = Rect()
-        paint.getTextBounds(text, 0, text.length, textBounds)
-
-        val x = editText.x - textPaddingLeft
-        val y = editText.y - textPaddingTop + textBounds.height()
-
-        val imageDrawable = imagePreview.drawable
-        val imageWidth = imageDrawable.intrinsicWidth
-        val imageHeight = imageDrawable.intrinsicHeight
-
-        val imageViewWidth = imagePreview.width
-        val imageViewHeight = imagePreview.height
-
-        val scaleFactorX = imageViewWidth.toFloat() / imageWidth.toFloat()
-        val scaleFactorY = imageViewHeight.toFloat() / imageHeight.toFloat()
-
-        val scale = if (scaleFactorX > scaleFactorY) scaleFactorY else scaleFactorX
-
-        val scaledImageWidth = (imageWidth * scale).toInt()
-        val scaledImageHeight = (imageHeight * scale).toInt()
-
-        val imageRect = Rect(
-            (imagePreview.x + (imageViewWidth - scaledImageWidth) / 2).toInt(),
-            (imagePreview.y + (imageViewHeight - scaledImageHeight) / 2).toInt(),
-            (imagePreview.x + (imageViewWidth + scaledImageWidth) / 2).toInt(),
-            (imagePreview.y + (imageViewHeight + scaledImageHeight) / 2).toInt()
-        )
-
-        val adjustedX = (x - imageRect.left) / scale
-        val adjustedY = (y - imageRect.top) / scale
-
-        val adjustedTextSize = textSize / scale
-        val adjustedPaddingLeft = textPaddingLeft / scale
-        val adjustedPaddingTop = textPaddingTop / scale
-
-        val adjustedPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        adjustedPaint.textSize = adjustedTextSize
-        adjustedPaint.color = textColor
-
-        val adjustedTextBounds = Rect()
-        adjustedPaint.getTextBounds(text, 0, text.length, adjustedTextBounds)
-
-        val adjustedXWithPadding = adjustedX + adjustedPaddingLeft
-        val adjustedYWithPadding = adjustedY + adjustedPaddingTop + adjustedTextBounds.height()
-
-        val adjustedYCorrection = adjustedTextBounds.height() - adjustedPaint.fontMetrics.descent
-        val adjustedYWithPaddingCorrection = adjustedYWithPadding - adjustedYCorrection
-
-        canvas.drawText(text, adjustedXWithPadding, adjustedYWithPaddingCorrection, adjustedPaint)
-        return resultBitmap
-    }
-
-    fun saveImageToGallery(bitmap: Bitmap) {
-        val imageName = "photofocus_${System.currentTimeMillis()}.jpg"
-        val dateTaken = System.currentTimeMillis()
-        var fos: OutputStream? = null
-        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q) {
-            this.contentResolver?.also {resolver ->
-                val contentValues = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, imageName)
-                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-                    put(MediaStore.Images.Media.DATE_ADDED, dateTaken / 1000)
-                    put(MediaStore.Images.Media.DATE_TAKEN, dateTaken)
-                }
-                val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-                fos = imageUri?.let {
-                    resolver.openOutputStream(it)
-                }
-            }
-        }
-        else {
-            val imagesDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val image = File(imagesDirectory, imageName)
-            fos = FileOutputStream(image)
-            MediaScannerConnection.scanFile(this, arrayOf(image.absolutePath), null, null)
-        }
-        fos?.use {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-            Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
-        }
-    }
     private fun crop() {
         cropTools = findViewById(R.id.cropBtnsLayout)
         cropping = findViewById(R.id.cropping)
@@ -728,7 +536,16 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         vignetteSeekBar!!.setOnSeekBarChangeListener(this)
         vignetteSeekBar!!.max = 100
         vignetteSeekBar!!.progress = 0
-
+    }
+    private fun updateCorrectionParametrs(){
+        tone = max(0.1F, toneSeekBar!!.progress / 10F)
+        saturation = max(1.0F, saturationSeekBar!!.progress / 10F)
+        bright = max(0.1F, brightSeekBar!!.progress / 10F)
+        exposition = max(0.1F, expositionSeekBar!!.progress / 10F)
+        contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
+        blur = max(0.1F, blurSeekBar!!.progress / 1F)
+        noise = max(0.1F, noiseSeekBar!!.progress / 10F)
+        vignette = max(0.1F, vignetteSeekBar!!.progress / 10F)
     }
     private fun handleTextViewClick(textView: TextView) {
         selectedTextView?.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
@@ -741,75 +558,29 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         selectedLinearLayout = linearLayout
     }
 
-    private external fun myBlur(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    private external fun myNoise(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    private external fun myTone(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    private external fun myExposition(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    private external fun myContrast(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    private external fun myBright(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    private external fun mySaturation(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    private external fun myVignette(bitmapIn: Bitmap, bitmapOut: Bitmap, sigma: Float)
-    private external fun myAutocorrect(bitmapIn: Bitmap, bitmapOut: Bitmap)
-
-    private var tone: Float = 0.0F
-    private var saturation: Float = 1.0F
-    private var bright: Float = 0.0F
-    private var exposition: Float = 0.0F
-    private var contrast: Float = 0.0F
-    private var blur: Float = 0.0F
-    private var noise: Float = 0.0F
-    private var vignette: Float = 0.0F
-
-    private var shouldApplyTone: Boolean = false
-    private var shouldApplySaturation: Boolean = false
-    private var shouldApplyBright: Boolean = false
-    private var shouldApplyExposition: Boolean = false
-    private var shouldApplyContrast: Boolean = false
-    private var shouldApplyBlur: Boolean = false
-    private var shouldApplyNoise: Boolean = false
-    private var shouldApplyVignette: Boolean = false
-
     @SuppressLint("StaticFieldLeak")
-    private inner class ApplyEffectsTask( ) : AsyncTask<Void, Void, Bitmap>() {
+    private inner class ApplyEffectsTask(
+        private val tone: Float,
+        private val saturation: Float,
+        private val bright: Float,
+        private val exposition: Float,
+        private val contrast: Float,
+        private val blur: Float,
+        private val noise: Float,
+        private val vignette: Float
+    ) : AsyncTask<Void, Void, Bitmap>() {
         @Deprecated("Deprecated in Java")
         override fun doInBackground(vararg params: Void): Bitmap {
-            val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
-
-            tone = max(0.1F, toneSeekBar!!.progress / 10F)
-            saturation = max(1.0F, saturationSeekBar!!.progress / 10F)
-            bright = max(0.1F, brightSeekBar!!.progress / 10F)
-            exposition = max(0.1F, expositionSeekBar!!.progress / 10F)
-            contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
-            blur = max(0.1F, blurSeekBar!!.progress / 1F)
-            noise = max(0.1F, noiseSeekBar!!.progress / 10F)
-            vignette = max(0.1F, vignetteSeekBar!!.progress / 10F)
-
-            if (shouldApplyTone) {
-                myTone(tempBitmap, tempBitmap, tone - 10F)
-            }
-            if (shouldApplySaturation) {
-                mySaturation(tempBitmap, tempBitmap, saturation - 10F)
-            }
-            if (shouldApplyBright) {
-                myBright(tempBitmap, tempBitmap, bright - 10F)
-            }
-            if (shouldApplyExposition) {
-                myExposition(tempBitmap, tempBitmap, exposition - 10F)
-            }
-            if (shouldApplyContrast) {
-                myContrast(tempBitmap, tempBitmap, contrast - 10F)
-            }
-            if (shouldApplyBlur) {
-                myBlur(tempBitmap, tempBitmap, blur)
-            }
-            if (shouldApplyNoise){
-                myNoise(tempBitmap, tempBitmap, noise)
-            }
-            if (shouldApplyVignette) {
-                myVignette(tempBitmap, tempBitmap, vignette)
-            }
-
-            return tempBitmap
+            return editImageModel.applyEffects(
+                tone,
+                saturation,
+                bright,
+                exposition,
+                contrast,
+                blur,
+                noise,
+                vignette
+            )
         }
         @Deprecated("Deprecated in Java")
         override fun onPostExecute(result: Bitmap) {
@@ -826,39 +597,31 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         when (seekBar) {
             toneSeekBar -> {
                 editTextTone!!.setText((seekBar!!.progress - 100).toString())
-                shouldApplyTone = true
-
             }
             saturationSeekBar -> {
                 editTextSaturation!!.setText((seekBar!!.progress - 100).toString())
-                shouldApplySaturation = true
             }
             brightSeekBar -> {
                 editTextBright!!.setText((seekBar!!.progress - 100).toString())
-                shouldApplyBright = true
             }
             expositionSeekBar -> {
                 editTextExposition!!.setText((seekBar!!.progress - 100).toString())
-                shouldApplyExposition = true
             }
             contrastSeekBar -> {
                 editTextContrast!!.setText((seekBar!!.progress - 100).toString())
-                shouldApplyContrast = true
             }
             blurSeekBar -> {
                 editTextBlur!!.setText((seekBar!!.progress).toString())
-                shouldApplyBlur = true
             }
             noiseSeekBar -> {
                 editTextNoise!!.setText((seekBar!!.progress).toString())
-                shouldApplyNoise = true
             }
             vignetteSeekBar -> {
                 editTextVignette!!.setText((seekBar!!.progress).toString())
-                shouldApplyVignette = true
             }
         }
-        ApplyEffectsTask().execute()
+        updateCorrectionParametrs()
+        ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
     }
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -874,38 +637,31 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             when (p0) {
                 editTextTone!!.text -> {
                     toneSeekBar!!.progress = value + 100
-                    shouldApplyTone = true
                 }
                 editTextSaturation!!.text -> {
                     saturationSeekBar!!.progress = value + 100
-                    shouldApplySaturation = true
                 }
                 editTextBright!!.text -> {
                     brightSeekBar!!.progress = value + 100
-                    shouldApplyBright = true
                 }
                 editTextExposition!!.text -> {
                     expositionSeekBar!!.progress = value + 100
-                    shouldApplyExposition = true
                 }
                 editTextContrast!!.text -> {
                     contrastSeekBar!!.progress = value + 100
-                    shouldApplyContrast = true
                 }
                 editTextBlur!!.text -> {
                     blurSeekBar!!.progress = value
-                    shouldApplyBlur = true
                 }
                 editTextNoise!!.text -> {
                     noiseSeekBar!!.progress = value
-                    shouldApplyNoise = true
                 }
                 editTextVignette!!.text -> {
                     vignetteSeekBar!!.progress = value
-                    shouldApplyVignette = true
                 }
             }
-            ApplyEffectsTask().execute()
+            updateCorrectionParametrs()
+            ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
         }
     }
     private fun showExitConfirmationDialog() {
@@ -919,10 +675,10 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val dontSaveBtn = dialogView.findViewById<Button>(R.id.dialog_dontSaveBtn)
 
         saveBtn.setOnClickListener {
-            dstBitmap = scaleBitmap(dstBitmap!!, originalWidth, originalHeight)
-            var combinedBitmap = combineImageAndText(dstBitmap!!, editText)
-            combinedBitmap = scaleBitmap(combinedBitmap!!, originalWidth, originalHeight)
-            saveImageToGallery(combinedBitmap)
+            //dstBitmap = scaleBitmap(dstBitmap!!, originalWidth, originalHeight)
+            val combinedBitmap = textModel.combineImageAndText(dstBitmap!!, imagePreview, editText)
+            //combinedBitmap = scaleBitmap(combinedBitmap!!, originalWidth, originalHeight)
+            editImageController.onSaveButtonClicked(combinedBitmap!!)
             val intent = Intent(this, GalleryActivity::class.java)
             startActivity(intent)
             dialog.dismiss()
@@ -933,7 +689,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             dialog.dismiss()
             finish()
         }
-
         dialog.show()
     }
 
@@ -956,7 +711,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         later.setOnClickListener {
             dialog.dismiss()
-            finish()
         }
 
         dialog.show()
@@ -1005,5 +759,18 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             showExitConfirmationDialog()
         }
     }
+    fun navigateToGallery() {
+        val intent = Intent(this, GalleryActivity::class.java)
+        intent.putExtra("screen", screen)
+        startActivity(intent)
+    }
+    fun showMessage(s: String) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
+    }
+    fun showImage(bitmap: Bitmap) {
+        imagePreview.setImageBitmap(bitmap)
+        dstBitmap =  bitmap.copy(Bitmap.Config.ARGB_8888, true)
+    }
+
 }
 

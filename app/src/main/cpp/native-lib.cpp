@@ -85,7 +85,7 @@ void matToBitmap(JNIEnv* env, const Mat& src, jobject bitmap, jboolean needPremu
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_stringFromJNI(
+Java_com_example_PhotoFocus_EditImageModel_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
@@ -94,7 +94,7 @@ Java_com_example_PhotoFocus_EditImageActivity_stringFromJNI(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_myBlur(JNIEnv *env, jobject, jobject bitmap_in,
+Java_com_example_PhotoFocus_EditImageModel_myBlur(JNIEnv *env, jobject, jobject bitmap_in,
                                                    jobject bitmap_out, jfloat sigma) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
@@ -104,7 +104,7 @@ Java_com_example_PhotoFocus_EditImageActivity_myBlur(JNIEnv *env, jobject, jobje
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_myNoise(JNIEnv *env, jobject, jobject bitmap_in,
+Java_com_example_PhotoFocus_EditImageModel_myNoise(JNIEnv *env, jobject, jobject bitmap_in,
                                                      jobject bitmap_out, jfloat sigma) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
@@ -114,7 +114,7 @@ Java_com_example_PhotoFocus_EditImageActivity_myNoise(JNIEnv *env, jobject, jobj
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_myTone(JNIEnv *env, jobject, jobject bitmap_in,
+Java_com_example_PhotoFocus_EditImageModel_myTone(JNIEnv *env, jobject, jobject bitmap_in,
                                                      jobject bitmap_out, jfloat sigma) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
@@ -124,7 +124,7 @@ Java_com_example_PhotoFocus_EditImageActivity_myTone(JNIEnv *env, jobject, jobje
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_mySaturation(JNIEnv *env, jobject, jobject bitmap_in,
+Java_com_example_PhotoFocus_EditImageModel_mySaturation(JNIEnv *env, jobject, jobject bitmap_in,
                                                        jobject bitmap_out, jfloat sigma) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
@@ -134,7 +134,7 @@ Java_com_example_PhotoFocus_EditImageActivity_mySaturation(JNIEnv *env, jobject,
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_myBright(JNIEnv *env, jobject, jobject bitmap_in,
+Java_com_example_PhotoFocus_EditImageModel_myBright(JNIEnv *env, jobject, jobject bitmap_in,
                                                       jobject bitmap_out, jfloat sigma) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
@@ -144,7 +144,7 @@ Java_com_example_PhotoFocus_EditImageActivity_myBright(JNIEnv *env, jobject, job
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_myExposition(JNIEnv *env, jobject, jobject bitmap_in,
+Java_com_example_PhotoFocus_EditImageModel_myExposition(JNIEnv *env, jobject, jobject bitmap_in,
                                                        jobject bitmap_out, jfloat sigma) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
@@ -153,7 +153,7 @@ Java_com_example_PhotoFocus_EditImageActivity_myExposition(JNIEnv *env, jobject,
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_myContrast(JNIEnv *env, jobject, jobject bitmap_in,
+Java_com_example_PhotoFocus_EditImageModel_myContrast(JNIEnv *env, jobject, jobject bitmap_in,
                                                            jobject bitmap_out, jfloat sigma) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
@@ -162,7 +162,7 @@ Java_com_example_PhotoFocus_EditImageActivity_myContrast(JNIEnv *env, jobject, j
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_myVignette(JNIEnv *env, jobject, jobject bitmap_in,
+Java_com_example_PhotoFocus_EditImageModel_myVignette(JNIEnv *env, jobject, jobject bitmap_in,
                                                          jobject bitmap_out, jfloat sigma) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
@@ -172,7 +172,7 @@ Java_com_example_PhotoFocus_EditImageActivity_myVignette(JNIEnv *env, jobject, j
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_PhotoFocus_EditImageActivity_myAutocorrect(JNIEnv *env, jobject, jobject bitmap_in,
+Java_com_example_PhotoFocus_EditImageModel_myAutocorrect(JNIEnv *env, jobject, jobject bitmap_in,
                                                          jobject bitmap_out) {
     Mat src;
     bitmapToMat(env, bitmap_in, src, false);
