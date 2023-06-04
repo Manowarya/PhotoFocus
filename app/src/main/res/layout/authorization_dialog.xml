@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Хотите сохранить изменения?"
+            android:text="Для использования этой функции войдите в аккаунт"
             android:gravity="center"
             android:textSize="@dimen/_14sdp"
             android:textColor="@color/white">
@@ -27,13 +27,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginVertical="@dimen/_10sdp"
-            >
+            android:gravity="center"
+            android:layout_marginVertical="@dimen/_10sdp">
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/dialog_saveBtn"
+                android:id="@+id/btn_authorization"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/save"
+                android:text="@string/sign_in"
                 android:textColor="@color/white"
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:textSize="@dimen/_14sdp"
@@ -41,10 +41,10 @@
                 style="@style/Widget.Material3.Button.OutlinedButton">
             </com.google.android.material.button.MaterialButton>
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/dialog_dontSaveBtn"
+                android:id="@+id/btn_later"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/no"
+                android:text="@string/later"
                 android:textColor="@color/white"
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:textSize="@dimen/_14sdp"

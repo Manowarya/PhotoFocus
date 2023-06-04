@@ -50,4 +50,5 @@
     <string name="password">Пароль</string>
     <string name="password2">Повторите пароль</string>
     <string name="enter_code2">Введите код</string>
+    <string name="later">Позже</string>
 </resources>

@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.*
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -22,11 +22,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.PhotoFocus.databinding.EditImageBinding
+import com.yandex.metrica.YandexMetrica
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -90,7 +92,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
     var originalWidth = 0
     var originalHeight = 0
-
+    var screen : String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         editImageBinding = EditImageBinding.inflate(layoutInflater)
@@ -120,12 +122,16 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                 }
 
                 override fun onLoadCleared(placeholder: Drawable?) {
-                                  }
+                }
             })
+
+        YandexMetrica.reportEvent(MetricEventNames.VISITED_EDIT_SCREEN)
 
         toolsLayout = findViewById(R.id.toolsLayout)
 
+        screen = intent.getStringExtra("screen")
         editImageBinding.cropBtn.setOnClickListener {
+            YandexMetrica.reportEvent(MetricEventNames.STARTED_EDIT_IMAGE)
             screenStack.add("crop")
             toolsLayout!!.visibility = View.GONE
             crop()
@@ -168,28 +174,49 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         setDefaultSeekBar()
 
         editImageBinding.correctionBtn.setOnClickListener {
+            YandexMetrica.reportEvent(MetricEventNames.STARTED_EDIT_IMAGE)
             screenStack.add("correction")
             toolsLayout!!.visibility = View.GONE
             correction()
         }
-
         val autocorrectionBtn = findViewById<TextView>(R.id.autocorrectionBtn)
-        autocorrectionBtn.setOnClickListener {
-            myAutocorrect(bitmap!!, dstBitmap!!)
-            editImageBinding.imagePreview.setImageBitmap(dstBitmap)
-        }
 
+        if (screen == "guest") {
+            val iconDrawable = ContextCompat.getDrawable(this, R.drawable.ic_hexagon)
+
+            val color = ContextCompat.getColor(this, R.color.light_gray)
+            val wrappedDrawable = DrawableCompat.wrap(iconDrawable!!.mutate())
+            DrawableCompat.setTint(wrappedDrawable, color)
+            autocorrectionBtn.setTextColor(ContextCompat.getColor(applicationContext, R.color.light_gray))
+            editImageBinding.templatesBtn.setTextColor(ContextCompat.getColor(applicationContext, R.color.light_gray))
+
+            autocorrectionBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null, wrappedDrawable, null, null)
+            editImageBinding.templatesBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null, wrappedDrawable, null, null)
+            autocorrectionBtn.setOnClickListener {
+                showAuthorizationDialog()
+            }
+            editImageBinding.templatesBtn.setOnClickListener {
+                showAuthorizationDialog()
+            }
+        } else {
+            autocorrectionBtn.setOnClickListener {
+                YandexMetrica.reportEvent(MetricEventNames.APPLY_AUTOCORR)
+                myAutocorrect(bitmap!!, dstBitmap!!)
+                editImageBinding.imagePreview.setImageBitmap(dstBitmap)
+            }
+            editImageBinding.templatesBtn.setOnClickListener {
+                YandexMetrica.reportEvent(MetricEventNames.APPLY_TEMPLATES)
+                screenStack.add("templates")
+                toolsLayout!!.visibility = View.GONE
+                templates()
+            }
+        }
         editText = findViewById(R.id.editText)
         editImageBinding.textBtn.setOnClickListener {
+            YandexMetrica.reportEvent(MetricEventNames.STARTED_EDIT_IMAGE)
             screenStack.add("text")
             toolsLayout!!.visibility = View.GONE
             myText()
-        }
-
-        editImageBinding.templatesBtn.setOnClickListener {
-            screenStack.add("templates")
-            toolsLayout!!.visibility = View.GONE
-            templates()
         }
 
         backBtn = findViewById(R.id.backBtn)
@@ -205,11 +232,12 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         saveBtn = findViewById(R.id.saveBtn)
         saveBtn?.setOnClickListener {
-           //dstBitmap = scaleBitmap(dstBitmap!!, originalWidth, originalHeight)
+            YandexMetrica.reportEvent(MetricEventNames.SAVE_IMAGE)
             var combinedBitmap = combineImageAndText(dstBitmap!!, editText)
             combinedBitmap = scaleBitmap(combinedBitmap!!, originalWidth, originalHeight)
             saveImageToGallery(combinedBitmap)
             val intent = Intent(this, GalleryActivity::class.java)
+            intent.putExtra("screen", screen)
             startActivity(intent)
         }
     }
@@ -253,7 +281,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         setTextToSmallImageView(sysTemplates_2, ResourcesCompat.getFont(this, R.font.nevduplenysh_regular), "Ч/Б")
         setTextToSmallImageView(sysTemplates_3, ResourcesCompat.getFont(this, R.font.nevduplenysh_regular), "Контраст")
         sysTemplates_1.setOnClickListener {
-           setDefaultSeekBar()
+            setDefaultSeekBar()
             ApplyEffectsTask().execute()
         }
         sysTemplates_2.setOnClickListener {
@@ -516,6 +544,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
     fun saveImageToGallery(bitmap: Bitmap) {
         val imageName = "photofocus_${System.currentTimeMillis()}.jpg"
+        val dateTaken = System.currentTimeMillis()
         var fos: OutputStream? = null
         if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q) {
             this.contentResolver?.also {resolver ->
@@ -523,6 +552,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                     put(MediaStore.MediaColumns.DISPLAY_NAME, imageName)
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
                     put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+                    put(MediaStore.Images.Media.DATE_ADDED, dateTaken / 1000)
+                    put(MediaStore.Images.Media.DATE_TAKEN, dateTaken)
                 }
                 val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
                 fos = imageUri?.let {
@@ -534,6 +565,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             val imagesDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val image = File(imagesDirectory, imageName)
             fos = FileOutputStream(image)
+            MediaScannerConnection.scanFile(this, arrayOf(image.absolutePath), null, null)
         }
         fos?.use {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
@@ -876,7 +908,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             ApplyEffectsTask().execute()
         }
     }
-
     private fun showExitConfirmationDialog() {
         val dialogView = layoutInflater.inflate(R.layout.back_dialog, null)
         val alertDialogBuilder = AlertDialog.Builder(this, R.style.DialogStyle)
@@ -899,6 +930,31 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         }
 
         dontSaveBtn.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+
+        dialog.show()
+    }
+
+    private fun showAuthorizationDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.authorization_dialog, null)
+        val alertDialogBuilder = AlertDialog.Builder(this, R.style.DialogStyle)
+        alertDialogBuilder.setView(dialogView)
+
+        val dialog = alertDialogBuilder.create()
+
+        val authorization = dialogView.findViewById<Button>(R.id.btn_authorization)
+        val later = dialogView.findViewById<Button>(R.id.btn_later)
+
+        authorization.setOnClickListener {
+            val intent = Intent(this, Authorization::class.java)
+            startActivity(intent)
+            dialog.dismiss()
+            finish()
+        }
+
+        later.setOnClickListener {
             dialog.dismiss()
             finish()
         }

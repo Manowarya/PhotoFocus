@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private fun setListeners() {
         binding.btnLoad.setOnClickListener {
             val intent = Intent(this, GalleryActivity::class.java)
+            intent.putExtra("screen", "guest")
             startActivity(intent)
         }
         binding.btnSignIn.setOnClickListener{

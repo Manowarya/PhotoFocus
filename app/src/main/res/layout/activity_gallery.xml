@@ -26,7 +26,8 @@
             android:minHeight="48dp"
             android:stateListAnimator="@null"
             android:text="@string/sign_in"
-            android:contentDescription="@string/back" />
+            android:contentDescription="@string/back"
+            android:visibility="visible"/>
     </androidx.appcompat.widget.Toolbar>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/image_recycler"

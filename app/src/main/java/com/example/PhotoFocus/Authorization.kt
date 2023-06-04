@@ -24,6 +24,7 @@ class Authorization : AppCompatActivity() {
             email_text = binding.emailSignIn.text.toString()
             password_text = binding.passwordSignIn.text.toString()
             val intent = Intent(this, GalleryActivity::class.java)
+            intent.putExtra("screen", "authorization")
             startActivity(intent)
         }
         binding.textRegister.setOnClickListener {
