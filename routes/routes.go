@@ -119,7 +119,7 @@ func AuthorizationUser(db *sql.DB) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		query := "SELECT id, password FROM users WHERE email = ?"
+		query := "SELECT id password FROM users WHERE email = ?"
 		var id int
 		var hashPassword string
 		if err := db.QueryRow(query, user.Email).Scan(&id, &hashPassword); err != nil {
@@ -135,7 +135,7 @@ func AuthorizationUser(db *sql.DB) echo.HandlerFunc {
 }
 
 func IsUniqueEmail(db *sql.DB, email string) bool {
-	query := "SELECT id, FROM users WHERE email = ?"
+	query := "SELECT id FROM users WHERE email = ?"
 	var id int
 	err := db.QueryRow(query, email).Scan(&id)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 )
 
 func Initialize() *sql.DB {
-	db, err := sql.Open("mysql", "root:assassin123and123@/photofocusdb")
+	db, err := sql.Open("mysql", "root:ZtanSNfZu4J905z04ON8@tcp(containers-us-west-72.railway.app:6891)/railway")
 
 	if err != nil {
 		panic("Error connecting to database")
