@@ -15,8 +15,6 @@ import retrofit2.Response
 class EnterCode : AppCompatActivity() {
     private lateinit var binding: ActivityEnterCodeBinding
 
-    var email : String = intent.getStringExtra("email").toString()
-
     private val retrofitService: RetrofitService = RetrofitService()
 
     private var code_text: String = ""
@@ -30,6 +28,7 @@ class EnterCode : AppCompatActivity() {
     }
     private fun setListeners() {
         binding.btnRegister.setOnClickListener {
+            val email : String = intent.getStringExtra("email").toString()
             code_text = binding.codeRegistraion.text.toString()
             sendCode(email, code_text)
         }

@@ -32,16 +32,33 @@ class Authorization : AppCompatActivity() {
         binding.btnSignIn.setOnClickListener {
             email_text = binding.emailSignIn.text.toString()
             password_text = binding.passwordSignIn.text.toString()
-            val intent = Intent(this, GalleryActivity::class.java)
-            intent.putExtra("screen", "authorization")
-            startActivity(intent)
+            authorization(email_text, password_text)
         }
         binding.textRegister.setOnClickListener {
             val intent = Intent(this, Registration::class.java)
             startActivity(intent)
         }
     }
+    fun authorization1(email: String, password: String){
+        val jsonObject = JSONObject()
+        jsonObject.put("email", email)
+        jsonObject.put("password", password)
 
+        val body = RequestBody.create(
+            "application/json".toMediaTypeOrNull(),
+            jsonObject.toString()
+        )
+        val response = retrofitService.retrofit.authorization(body).execute()
+        if (response.isSuccessful) {
+            val id = response.body()
+            val bundle = Bundle()
+            val intent = Intent(this@Authorization, GalleryActivity::class.java)
+            bundle.putString("id", id)
+            bundle.putString("screen", "authorization")
+            intent.putExtras(bundle)
+            startActivity(intent)
+        }
+    }
     fun authorization(email: String, password: String){
         val jsonObject = JSONObject()
         jsonObject.put("email", email)
@@ -51,11 +68,15 @@ class Authorization : AppCompatActivity() {
             "application/json".toMediaTypeOrNull(),
             jsonObject.toString()
         )
-        retrofitService.retrofit.authorization(body).enqueue(object : Callback<Int> {
-            override fun onResponse(call: Call<Int>?, response: Response<Int>) {
-                if (response.isSuccessful) {
-                    var id = response.body()
+        retrofitService.retrofit.authorization(body).enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if (response.code() == 201) {
+                    val id = response.body()
+                    val bundle = Bundle()
                     val intent = Intent(this@Authorization, GalleryActivity::class.java)
+                    bundle.putString("id", id)
+                    bundle.putString("screen", "authorization")
+                    intent.putExtras(bundle)
                     startActivity(intent)
                 }
                 if (response.code() == 400) {
@@ -77,7 +98,7 @@ class Authorization : AppCompatActivity() {
                     return
                 }
             }
-            override fun onFailure(call: Call<Int>?, t: Throwable?) {}
+            override fun onFailure(call: Call<String>?, t: Throwable?) {}
         })
     }
 }

@@ -22,5 +22,5 @@ interface ApiService {
     fun sendCode(@Body body: RequestBody): Call<String>
 
     @POST("/authorization")
-    fun authorization(@Body body: RequestBody): Call<Int>
+    fun authorization(@Body body: RequestBody): Call<String>
 }

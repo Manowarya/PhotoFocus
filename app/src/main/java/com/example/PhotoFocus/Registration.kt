@@ -58,7 +58,7 @@ class Registration : AppCompatActivity() {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful) {
                     val intent = Intent(this@Registration, EnterCode::class.java)
-                    intent.putExtra("email", email_text)
+                    intent.putExtra("email", email)
                     startActivity(intent)
                 }
                 else if (response.code() == 400){
