@@ -15,7 +15,6 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.GridLayoutManager
 
 class GalleryActivity : AppCompatActivity() {
-
     private var imageRecycler:RecyclerView?=null
     private var allPictures:ArrayList<Image>?=null
 
