@@ -48,4 +48,16 @@ func Migrate(db *sql.DB) {
 	if err != nil {
 		panic(err)
 	}
+
+	fontSql := `
+    CREATE TABLE IF NOT EXISTS font(
+		font_id INT PRIMARY KEY AUTO_INCREMENT,
+    	font MEDIUMBLOB NOT NULL
+	);
+    `
+
+	_, err = db.Exec(fontSql)
+	if err != nil {
+		panic(err)
+	}
 }

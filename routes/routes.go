@@ -56,6 +56,16 @@ func SaveTemplate(db *sql.DB) echo.HandlerFunc {
 	}
 }
 
+func DeleteTemplate(db *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if err := model.SaveTemplate(db, c); err != nil {
+			return c.JSON(http.StatusBadGateway, "Ошибка сервера, попробуйте позже")
+
+		}
+		return c.JSON(http.StatusCreated, "Шаблон успешно создан")
+	}
+}
+
 func VerificationEmail(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := new(model.User)
@@ -119,7 +129,7 @@ func AuthorizationUser(db *sql.DB) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		query := "SELECT id password FROM users WHERE email = ?"
+		query := "SELECT id, password FROM users WHERE email = ?"
 		var id int
 		var hashPassword string
 		if err := db.QueryRow(query, user.Email).Scan(&id, &hashPassword); err != nil {
