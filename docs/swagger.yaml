@@ -83,7 +83,7 @@ paths:
       summary: AuthorizationUser
       tags:
       - User
-  /get-templates/:id:
+  /get-templates/{id}:
     get:
       consumes:
       - application/json

@@ -68,7 +68,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get-templates/:id": {
+        "/get-templates/{id}": {
             "get": {
                 "description": "Отправляет шаблон по индефикатору пользователя",
                 "consumes": [

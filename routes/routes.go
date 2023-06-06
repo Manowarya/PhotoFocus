@@ -45,7 +45,7 @@ func (s *smtpServer) Address() string {
 // @Param id path string true "User ID"
 // @Success 200 {object} model.Templates
 // @Failure 502 {string} string "Ошибка сервера, попробуйте позже"
-// @Router /get-templates/:id [get]
+// @Router /get-templates/{id} [get]
 func GetTemplate(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
