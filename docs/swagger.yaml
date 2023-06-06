@@ -43,7 +43,7 @@ definitions:
       email:
         type: string
     type: object
-host: https://photofocus-production.up.railway.app
+host: photofocus-production.up.railway.app
 info:
   contact: {}
   title: PhotoFocus API

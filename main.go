@@ -17,7 +17,7 @@ import (
 // @title PhotoFocus API
 // @version 1.0.4
 
-// @host https://photofocus-production.up.railway.app
+// @host photofocus-production.up.railway.app
 
 func main() {
 
