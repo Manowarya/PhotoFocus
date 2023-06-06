@@ -2,7 +2,7 @@ package model
 
 import (
 	"database/sql"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
@@ -12,6 +12,7 @@ type User struct {
 }
 
 type Template struct {
+	Name       string  `json:"name"`
 	UserId     int64   `json:"user_id"`
 	Tone       float32 `json:"tone"`
 	Saturation float32 `json:"saturation"`
@@ -24,7 +25,7 @@ type Template struct {
 }
 
 type Templates struct {
-	Templates []Template `json:"items"`
+	Templates []Template `json:"templates"`
 }
 
 func GetTemplates(db *sql.DB, userId string) (Templates, error) {
@@ -34,14 +35,14 @@ func GetTemplates(db *sql.DB, userId string) (Templates, error) {
 		return templates, nil
 	}
 
-	rows, err := db.Query("SELECT * FROM templates WHERE user_id=?", userId)
+	rows, err := db.Query("SELECT name, tone, saturation, bright, exposition, contrast, blur, noise, vignette  FROM templates WHERE user_id=?", userId)
 
 	defer rows.Close()
 
 	for rows.Next() {
 		template := Template{}
 		err = rows.Scan(
-			&template.UserId,
+			&template.Name,
 			&template.Tone,
 			&template.Saturation,
 			&template.Bright,
@@ -66,12 +67,11 @@ func SaveTemplate(db *sql.DB, c echo.Context) error {
 		return err
 	}
 
-	insertQuery := "INSERT INTO templates (user_id, text, font_size, text_color, font, light, bokeh, color, grain, vignette) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	_, err := db.Exec(insertQuery, template.UserId, template.Tone, template.Saturation, template.Bright, template.Exposition, template.Contrast, template.Blur, template.Noise, template.Vignette)
+	insertQuery := "INSERT INTO templates (name, user_id, tone, saturation, bright, exposition, contrast, blur, noise, vignette) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	_, err := db.Exec(insertQuery, template.Name, template.UserId, template.Tone, template.Saturation, template.Bright, template.Exposition, template.Contrast, template.Blur, template.Noise, template.Vignette)
 
 	return err
 }
-
 func CreateUser(c echo.Context) error {
 	user := new(User)
 	if err := c.Bind(user); err != nil {

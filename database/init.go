@@ -30,7 +30,7 @@ func Migrate(db *sql.DB) {
 
 	templateSql := `
     CREATE TABLE IF NOT EXISTS templates(
-		id INT PRIMARY KEY AUTO_INCREMENT,
+		name VARCHAR(8) NOT NULL,
 		user_id INT NOT NULL,
 		tone FLOAT NOT NULL,
 		saturation FLOAT NOT NULL, 
@@ -40,6 +40,7 @@ func Migrate(db *sql.DB) {
 		blur FLOAT NOT NULL,
 		noise FLOAT NOT NULL,
 		vignette FLOAT NOT NULL,
+		PRIMARY KEY (name, user_id),
 		FOREIGN KEY (user_id) REFERENCES users (id)
 	);
     `
