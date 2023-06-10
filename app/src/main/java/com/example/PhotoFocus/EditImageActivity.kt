@@ -16,7 +16,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.example.PhotoFocus.databinding.EditImageBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.yandex.metrica.YandexMetrica
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.lang.Float.max
 
 class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, TextWatcher {
@@ -29,8 +34,11 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
     private lateinit var editImageBinding: EditImageBinding
 
+    private val retrofitService: RetrofitService = RetrofitService()
+
     private var selectedTextView: TextView? = null
     private var selectedLinearLayout: LinearLayout? = null
+
 
     private var toneSeekBar: SeekBar? = null
     private var saturationSeekBar: SeekBar? = null
@@ -74,6 +82,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     private lateinit var editText: EditText
 
     var screen : String? = null
+    var id : String? = null
 
     private lateinit var editImageModel: EditImageModel
     private lateinit var textModel: TextModel
@@ -111,6 +120,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         toolsLayout = findViewById(R.id.toolsLayout)
 
         screen = intent.getStringExtra("screen")
+        id = intent.getStringExtra("id")
         editImageBinding.cropBtn.setOnClickListener {
             YandexMetrica.reportEvent(MetricEventNames.STARTED_EDIT_IMAGE)
             screenStack.add("crop")
@@ -221,6 +231,26 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             editImageController.onSaveButtonClicked(combinedBitmap!!)
         }
     }
+
+    class Template (
+        val name:       String,
+        val userId:     Int,
+        val tone:       Float,
+        val saturation: Float,
+        val bright:     Float,
+        val exposition: Float,
+        val contrast:   Float,
+        val blur:       Float,
+        val noise:      Float,
+        val vignette:   Float
+    ) {
+        override fun toString(): String {
+            return "[name: ${this.name}, user_id: ${this.userId}, tone: ${this.tone}, " +
+                    "saturation: ${this.saturation}, bright: ${this.bright}, " +
+                    "exposition: ${this.exposition}, contrast: ${this.contrast}, blur: ${this.blur}, noise: ${this.noise}, vignette: ${this.vignette}]"
+        }
+    }
+
   private fun templates() {
         saveBtn!!.visibility=View.GONE
         templatesBtnsLayout = findViewById(R.id.templatesBtnsLayout)
@@ -230,6 +260,12 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         userTemplates = findViewById(R.id.userTemplates)
         templatesSysLayout = findViewById(R.id.templatesSysLayout)
         val templatesUserLayout = findViewById<LinearLayout>(R.id.templatesUserLayout)
+
+        val gson = Gson()
+        val arrayTutorialType = object : TypeToken<Array<Template>>() {}.type
+
+      val message: Response<String> = retrofitService.retrofit.getTemplate(id.toString())
+
 
         val sysTemplates_1 = findViewById<ImageView>(R.id.sysTemplates_1)
         val sysTemplates_2 = findViewById<ImageView>(R.id.sysTemplates_2)
@@ -763,6 +799,17 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val intent: Intent?
         if (screen == "authorization") {
             intent = Intent(this, UserTemplates::class.java)
+            val bundle = Bundle()
+            bundle.putString("id", id)
+            bundle.putFloat("tone", tone)
+            bundle.putFloat("saturation", saturation)
+            bundle.putFloat("bright", bright)
+            bundle.putFloat("exposition", exposition)
+            bundle.putFloat("contrast", contrast)
+            bundle.putFloat("blur", blur)
+            bundle.putFloat("noise", noise)
+            bundle.putFloat("vignette", vignette)
+            intent.putExtras(bundle)
         } else {
             intent = Intent(this, GalleryActivity::class.java)
             intent.putExtra("screen", screen)

@@ -1,6 +1,7 @@
 package com.example.PhotoFocus
 
 import android.content.Intent
+import android.database.Observable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -39,26 +40,7 @@ class Authorization : AppCompatActivity() {
             startActivity(intent)
         }
     }
-    fun authorization1(email: String, password: String){
-        val jsonObject = JSONObject()
-        jsonObject.put("email", email)
-        jsonObject.put("password", password)
 
-        val body = RequestBody.create(
-            "application/json".toMediaTypeOrNull(),
-            jsonObject.toString()
-        )
-        val response = retrofitService.retrofit.authorization(body).execute()
-        if (response.isSuccessful) {
-            val id = response.body()
-            val bundle = Bundle()
-            val intent = Intent(this@Authorization, GalleryActivity::class.java)
-            bundle.putString("id", id)
-            bundle.putString("screen", "authorization")
-            intent.putExtras(bundle)
-            startActivity(intent)
-        }
-    }
     fun authorization(email: String, password: String){
         val jsonObject = JSONObject()
         jsonObject.put("email", email)
@@ -70,8 +52,8 @@ class Authorization : AppCompatActivity() {
         )
         retrofitService.retrofit.authorization(body).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                if (response.code() == 201) {
-                    val id = response.body()
+                if (response.isSuccessful) {
+                    val id = response.body().toString().replace("\n", "")
                     val bundle = Bundle()
                     val intent = Intent(this@Authorization, GalleryActivity::class.java)
                     bundle.putString("id", id)

@@ -7,13 +7,14 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ApiService {
-    @GET("/fetch-values")
-    suspend fun getTemplate(): Response<ResponseBody>
+    @GET("/get-templates/{id}")
+    fun getTemplate(@Path("id") id: String): Response<String>
 
     @POST("/save-template")
-    suspend fun saveTemplate(@Body requestBody: RequestBody): Response<ResponseBody>
+    fun saveTemplate(@Body requestBody: RequestBody): Call<String>
 
     @POST("/verification")
     fun registerUser(@Body requestBody: RequestBody): Call<String>

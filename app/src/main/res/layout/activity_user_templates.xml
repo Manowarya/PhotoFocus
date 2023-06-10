@@ -98,7 +98,7 @@
             android:alpha="0.8"
             android:gravity="center"
             android:maxLines="1"
-            android:inputType="number"
+            android:inputType="text"
             android:hint="@string/name_templates2"
             android:layout_marginBottom="@dimen/_20sdp"
             />
