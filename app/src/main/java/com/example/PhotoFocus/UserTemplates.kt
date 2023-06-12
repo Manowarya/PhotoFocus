@@ -101,6 +101,7 @@ class UserTemplates : AppCompatActivity() {
                 if (response.code() == 201) {
                     val bundle = Bundle()
                     val intent = Intent(this@UserTemplates, GalleryActivity::class.java)
+                    bundle.putString("id", userId)
                     bundle.putString("screen", "authorization")
                     intent.putExtras(bundle)
                     startActivity(intent)

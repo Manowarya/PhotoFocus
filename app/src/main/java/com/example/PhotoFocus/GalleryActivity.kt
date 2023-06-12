@@ -44,7 +44,7 @@ class GalleryActivity : AppCompatActivity() {
         if(allPictures!!.isEmpty()){
             allPictures=getAllImages()
 
-            imageRecycler?.adapter=GalleryAdapter(this, allPictures!!, screen!!, id!!)
+            imageRecycler?.adapter=GalleryAdapter(this, allPictures!!, screen!!, id)
         }
         signIn = findViewById(R.id.btnSignInGallery)
         if (screen == "authorization") {
