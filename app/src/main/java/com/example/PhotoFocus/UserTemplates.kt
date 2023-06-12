@@ -98,7 +98,7 @@ class UserTemplates : AppCompatActivity() {
 
         retrofitService.retrofit.saveTemplate(body).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                if (response.isSuccessful) {
+                if (response.code() == 201) {
                     val bundle = Bundle()
                     val intent = Intent(this@UserTemplates, GalleryActivity::class.java)
                     bundle.putString("screen", "authorization")

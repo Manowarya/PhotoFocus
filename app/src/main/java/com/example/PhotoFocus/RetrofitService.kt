@@ -2,6 +2,7 @@ package com.example.PhotoFocus
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 
@@ -10,7 +11,7 @@ class RetrofitService {
         val httpClient = OkHttpClient.Builder()
         val builder = Retrofit.Builder()
             .baseUrl("https://photofocus-production.up.railway.app")
-            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
 
         val retrofit = builder
             .client(httpClient.build())

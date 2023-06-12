@@ -11,7 +11,7 @@ import retrofit2.http.Path
 
 interface ApiService {
     @GET("/get-templates/{id}")
-    fun getTemplate(@Path("id") id: String): Response<String>
+    suspend fun getTemplate(@Path("id") id: String): Response<EditImageActivity.Templates>
 
     @POST("/save-template")
     fun saveTemplate(@Body requestBody: RequestBody): Call<String>

@@ -15,10 +15,17 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.PhotoFocus.databinding.EditImageBinding
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.yandex.metrica.YandexMetrica
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -232,8 +239,14 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         }
     }
 
+    class Templates(
+        @SerializedName("templates")
+        var list: List<Template>
+    )
     class Template (
         val name:       String,
+
+        @SerializedName("user_id")
         val userId:     Int,
         val tone:       Float,
         val saturation: Float,
@@ -243,13 +256,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val blur:       Float,
         val noise:      Float,
         val vignette:   Float
-    ) {
-        override fun toString(): String {
-            return "[name: ${this.name}, user_id: ${this.userId}, tone: ${this.tone}, " +
-                    "saturation: ${this.saturation}, bright: ${this.bright}, " +
-                    "exposition: ${this.exposition}, contrast: ${this.contrast}, blur: ${this.blur}, noise: ${this.noise}, vignette: ${this.vignette}]"
-        }
-    }
+    )
 
   private fun templates() {
         saveBtn!!.visibility=View.GONE
@@ -261,10 +268,59 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         templatesSysLayout = findViewById(R.id.templatesSysLayout)
         val templatesUserLayout = findViewById<LinearLayout>(R.id.templatesUserLayout)
 
-        val gson = Gson()
-        val arrayTutorialType = object : TypeToken<Array<Template>>() {}.type
+      val viewTemplates = mutableListOf<ImageView>()
 
-      val message: Response<String> = retrofitService.retrofit.getTemplate(id.toString())
+      CoroutineScope(Dispatchers.IO).launch {
+          val response: Response<Templates> = retrofitService.retrofit.getTemplate("10")
+          val templates = response.body()?.list
+          withContext(Dispatchers.Main) {
+              if (response.isSuccessful) {
+                  for(x in templates!!.indices) {
+                      if (x == 0) {
+                          viewTemplates.add(findViewById(R.id.userTemplates_1))
+                      }
+                      if (x == 1) {
+                          viewTemplates.add(findViewById(R.id.userTemplates_2))
+                      }
+                      if (x == 2) {
+                          viewTemplates.add(findViewById(R.id.userTemplates_3))
+                      }
+                      if (x == 3) {
+                          viewTemplates.add(findViewById(R.id.userTemplates_4))
+                      }
+                      if (x == 4) {
+                          viewTemplates.add(findViewById(R.id.userTemplates_5))
+                      }
+                      if (x == 5) {
+                          viewTemplates.add(findViewById(R.id.userTemplates_6))
+                      }
+                      setTextToSmallImageView(viewTemplates[x], ResourcesCompat.getFont(this@EditImageActivity, R.font.nevduplenysh_regular), templates[x].name)
+                      viewTemplates[x].setOnClickListener {
+                          setDefaultSeekBar()
+                          toneSeekBar?.progress = templates[x].tone.toInt()
+                          editTextTone?.setText((templates[x].tone - 100).toString())
+                          saturationSeekBar?.progress = templates[x].saturation.toInt()
+                          editTextSaturation?.setText((templates[x].saturation - 100).toString())
+                          brightSeekBar?.progress = templates[x].bright.toInt()
+                          editTextBright?.setText((templates[x].bright - 100).toString())
+                          expositionSeekBar?.progress = templates[x].exposition.toInt()
+                          editTextExposition?.setText((templates[x].exposition - 100).toString())
+                          contrastSeekBar?.progress = templates[x].contrast.toInt()
+                          editTextContrast?.setText((templates[x].contrast - 100).toString())
+                          blurSeekBar?.progress = templates[x].blur.toInt()
+                          editTextBlur?.setText(templates[x].blur.toString())
+                          noiseSeekBar?.progress = templates[x].noise.toInt()
+                          editTextNoise?.setText(templates[x].noise.toString())
+                          vignetteSeekBar?.progress = templates[x].vignette.toInt()
+                          editTextVignette?.setText((templates[x].vignette - 100).toString())
+                          updateCorrectionParametrs()
+                          ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
+                      }
+                  }
+              }
+          }
+      }
+
 
 
         val sysTemplates_1 = findViewById<ImageView>(R.id.sysTemplates_1)
