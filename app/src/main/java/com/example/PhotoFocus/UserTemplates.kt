@@ -42,11 +42,11 @@ class UserTemplates : AppCompatActivity() {
 
         val id = intent.getStringExtra("id").toString().replace("\n", "")
 
-        val tone = intent.getFloatExtra("tone", 10.0F)
-        val saturation = intent.getFloatExtra("saturation", 10.0F)
-        val bright = intent.getFloatExtra("bright", 10.0F)
-        val exposition = intent.getFloatExtra("exposition", 10.0F)
-        val contrast = intent.getFloatExtra("contrast", 10.0F)
+        val tone = intent.getFloatExtra("tone", 0.0F)
+        val saturation = intent.getFloatExtra("saturation", 0.0F)
+        val bright = intent.getFloatExtra("bright", 0.0F)
+        val exposition = intent.getFloatExtra("exposition", 0.0F)
+        val contrast = intent.getFloatExtra("contrast", 0.0F)
         val blur = intent.getFloatExtra("blur", 0.0F)
         val noise = intent.getFloatExtra("noise", 0.0F)
         val vignette = intent.getFloatExtra("vignette", 0.0F)

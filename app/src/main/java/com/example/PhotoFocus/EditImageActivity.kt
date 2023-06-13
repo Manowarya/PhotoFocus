@@ -97,11 +97,11 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     private lateinit var textModel: TextModel
     private lateinit var editImageController: EditImageController
 
-    private var tone: Float = 10.0F
-    private var saturation: Float = 10.0F
-    private var bright: Float = 10.0F
-    private var exposition: Float = 10.0F
-    private var contrast: Float = 10.0F
+    private var tone: Float = 0.0F
+    private var saturation: Float = 0.0F
+    private var bright: Float = 0.0F
+    private var exposition: Float = 0.0F
+    private var contrast: Float = 0.0F
     private var blur: Float = 0.0F
     private var noise: Float = 0.0F
     private var vignette: Float = 0.0F
@@ -289,14 +289,14 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                               nameChangeTemplates = templates[x].name
                               setDefaultSeekBar()
                               toneSeekBar?.progress = templates[x].tone.toInt()
-                              editTextTone?.setText((templates[x].tone.toInt() - 100).toString())
+                              editTextTone?.setText((templates[x].tone.toInt()).toString())
                               saturationSeekBar?.progress = templates[x].saturation.toInt()
-                              editTextSaturation?.setText((templates[x].saturation.toInt() - 100).toString())
+                              editTextSaturation?.setText((templates[x].saturation.toInt()).toString())
                               brightSeekBar?.progress = templates[x].bright.toInt()
-                              editTextBright?.setText((templates[x].bright.toInt() - 100).toString())
-                              expositionSeekBar?.progress = templates[x].exposition.toInt() + 100
+                              editTextBright?.setText((templates[x].bright.toInt()).toString())
+                              expositionSeekBar?.progress = templates[x].exposition.toInt()
                               editTextExposition?.setText((templates[x].exposition.toInt()).toString())
-                              contrastSeekBar?.progress = templates[x].contrast.toInt() + 100
+                              contrastSeekBar?.progress = templates[x].contrast.toInt()
                               editTextContrast?.setText((templates[x].contrast.toInt()).toString())
                               blurSeekBar?.progress = templates[x].blur.toInt()
                               editTextBlur?.setText(templates[x].blur.toString())
@@ -565,6 +565,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         selectedLinearLayout = colorLinearLayout
         handleTextViewClick(color!!)
+        linearLayoutVisible(colorLinearLayout!!)
         saveBtn!!.visibility = View.GONE
 
         color!!.setOnClickListener{
@@ -630,14 +631,14 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         vignetteSeekBar!!.progress = 0
     }
     private fun updateCorrectionParametrs(){
-        tone = max(0.0F, toneSeekBar!!.progress / 10F)
-        saturation = max(0.0F, saturationSeekBar!!.progress / 10F)
-        bright = max(0.0F, brightSeekBar!!.progress / 10F)
-        exposition = max(0.0F, expositionSeekBar!!.progress / 10F)
-        contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
+        tone = max(0.0F, toneSeekBar!!.progress / 1F)
+        saturation = max(0.0F, saturationSeekBar!!.progress / 1F)
+        bright = max(0.0F, brightSeekBar!!.progress / 1F)
+        exposition = max(0.0F, expositionSeekBar!!.progress / 1F)
+        contrast = max(0.1F, contrastSeekBar!!.progress / 1F)
         blur = max(0.0F, blurSeekBar!!.progress / 1F)
-        noise = max(0.0F, noiseSeekBar!!.progress / 10F)
-        vignette = max(0.0F, vignetteSeekBar!!.progress / 10F)
+        noise = max(0.0F, noiseSeekBar!!.progress / 1F)
+        vignette = max(0.0F, vignetteSeekBar!!.progress / 1F)
     }
     private fun handleTextViewClick(textView: TextView) {
         selectedTextView?.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
@@ -910,11 +911,11 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             intent = Intent(this, UserTemplates::class.java)
             val bundle = Bundle()
             bundle.putString("id", id)
-            bundle.putFloat("tone", tone)
-            bundle.putFloat("saturation", saturation)
-            bundle.putFloat("bright", bright)
-            bundle.putFloat("exposition", exposition)
-            bundle.putFloat("contrast", contrast)
+            bundle.putFloat("tone", tone-100)
+            bundle.putFloat("saturation", saturation-100)
+            bundle.putFloat("bright", bright-100)
+            bundle.putFloat("exposition", exposition-100)
+            bundle.putFloat("contrast", contrast-100)
             bundle.putFloat("blur", blur)
             bundle.putFloat("noise", noise)
             bundle.putFloat("vignette", vignette)

@@ -106,38 +106,38 @@ class EditImageModel(private val activity: EditImageActivity) {
 
         toneText = noise
 
-        val shouldApplyTone = tone != 10.0F
-        val shouldApplySaturation = saturation != 10.0F
-        val shouldApplyBright = bright != 10.0F
-        val shouldApplyExposition = exposition != 10.0F
-        val shouldApplyContrast = contrast != 10.0F
+        val shouldApplyTone = tone != 100.0F
+        val shouldApplySaturation = saturation != 100.0F
+        val shouldApplyBright = bright != 100.0F
+        val shouldApplyExposition = exposition != 100.0F
+        val shouldApplyContrast = contrast != 100.0F
         val shouldApplyBlur = blur != 0.0F
         val shouldApplyNoise = noise != 0.0F
         val shouldApplyVignette = vignette != 0.0F
 
         if (shouldApplyTone) {
-            myTone(tempBitmap, tempBitmap, tone - 10F)
+            myTone(tempBitmap, tempBitmap, tone)
         }
         if (shouldApplySaturation) {
-            mySaturation(tempBitmap, tempBitmap, saturation - 10F)
+            mySaturation(tempBitmap, tempBitmap, (saturation - 100) / 10)
         }
         if (shouldApplyBright) {
-            myBright(tempBitmap, tempBitmap, bright - 10F)
+            myBright(tempBitmap, tempBitmap, (bright - 100)/10)
         }
         if (shouldApplyExposition) {
-            myExposition(tempBitmap, tempBitmap, exposition - 10F)
+            myExposition(tempBitmap, tempBitmap, exposition / 10)
         }
         if (shouldApplyContrast) {
-            myContrast(tempBitmap, tempBitmap, contrast - 10F)
+            myContrast(tempBitmap, tempBitmap, contrast / 10)
         }
         if (shouldApplyBlur) {
-            myBlur(tempBitmap, tempBitmap, blur)
+            myBlur(tempBitmap, tempBitmap, blur / 10)
         }
         if (shouldApplyNoise) {
-            myNoise(tempBitmap, tempBitmap, noise)
+            myNoise(tempBitmap, tempBitmap, noise / 10)
         }
         if (shouldApplyVignette) {
-            myVignette(tempBitmap, tempBitmap, vignette)
+            myVignette(tempBitmap, tempBitmap, vignette / 10)
         }
         dstBitmap = tempBitmap
         return tempBitmap
