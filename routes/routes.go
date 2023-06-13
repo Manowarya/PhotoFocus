@@ -79,11 +79,11 @@ func SaveTemplate(db *sql.DB) echo.HandlerFunc {
 
 func DeleteTemplate(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := model.SaveTemplate(db, c); err != nil {
+		if err := model.DeleteTemplate(db, c); err != nil {
 			return c.JSON(http.StatusBadGateway, "Ошибка сервера, попробуйте позже")
 
 		}
-		return c.JSON(http.StatusCreated, "Шаблон успешно создан")
+		return c.JSON(http.StatusCreated, "Шаблон удален")
 	}
 }
 

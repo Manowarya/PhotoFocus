@@ -37,7 +37,7 @@ func main() {
 
 	e.GET("/get-templates/:id", routes.GetTemplate(db))
 	e.POST("/save-template", routes.SaveTemplate(db))
-	e.DELETE("/delete-template/:id", routes.DeleteTemplate(db))
+	e.POST("/delete-template", routes.DeleteTemplate(db))
 	e.POST("/verification", routes.VerificationEmail(db))
 	e.POST("/register", routes.RegisterUser(db))
 	e.POST("/authorization", routes.AuthorizationUser(db))

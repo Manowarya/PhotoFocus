@@ -72,6 +72,17 @@ func SaveTemplate(db *sql.DB, c echo.Context) error {
 
 	return err
 }
+
+func DeleteTemplate(db *sql.DB, c echo.Context) error {
+	template := new(Template)
+	if err := c.Bind(template); err != nil {
+		return err
+	}
+	_, err := db.Query("DELETE FROM templates WHERE user_id=? and name = ?", template.UserId, template.Name)
+
+	return err
+}
+
 func CreateUser(c echo.Context) error {
 	user := new(User)
 	if err := c.Bind(user); err != nil {
