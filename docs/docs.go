@@ -159,7 +159,7 @@ const docTemplate = `{
             }
         },
         "/save-template": {
-            "put": {
+            "post": {
                 "description": "Изменение шаблона",
                 "consumes": [
                     "application/json"
@@ -170,7 +170,7 @@ const docTemplate = `{
                 "tags": [
                     "Templates"
                 ],
-                "summary": "SaveTemplate",
+                "summary": "UpdateTemplate",
                 "parameters": [
                     {
                         "description": "Template",
@@ -185,44 +185,6 @@ const docTemplate = `{
                 "responses": {
                     "201": {
                         "description": "Шаблон изменен",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "502": {
-                        "description": "Ошибка сервера, попробуйте позже",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Создание нового шаблона",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Templates"
-                ],
-                "summary": "SaveTemplate",
-                "parameters": [
-                    {
-                        "description": "Template",
-                        "name": "template",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.Template"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Шаблон успешно создан",
                         "schema": {
                             "type": "string"
                         }

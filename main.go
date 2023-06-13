@@ -12,12 +12,20 @@ import (
 	"github.com/swaggo/swag"
 	"net/http"
 	_ "net/http"
+	"regexp"
 )
 
 // @title PhotoFocus API
 // @version 1.0.5
 
 // @host photofocus-production.up.railway.app
+
+func allowOrigin(origin string) (bool, error) {
+	// In this example we use a regular expression but we can imagine various
+	// kind of custom logic. For example, an external datasource could be used
+	// to maintain the list of allowed origins.
+	return regexp.MatchString(`^https:\/\/labstack\.(net|com)$`, origin)
+}
 
 func main() {
 
@@ -27,6 +35,7 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
@@ -37,7 +46,7 @@ func main() {
 
 	e.GET("/get-templates/:id", routes.GetTemplate(db))
 	e.POST("/save-template", routes.SaveTemplate(db))
-	e.PUT("/update-template", routes.UpdateTemplate(db))
+	e.POST("/update-template", routes.UpdateTemplate(db))
 	e.POST("/delete-template", routes.DeleteTemplate(db))
 	e.POST("/verification", routes.VerificationEmail(db))
 	e.POST("/register", routes.RegisterUser(db))

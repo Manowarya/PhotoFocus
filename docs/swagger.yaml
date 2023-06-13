@@ -146,31 +146,6 @@ paths:
     post:
       consumes:
       - application/json
-      description: Создание нового шаблона
-      parameters:
-      - description: Template
-        in: body
-        name: template
-        required: true
-        schema:
-          $ref: '#/definitions/model.Template'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Шаблон успешно создан
-          schema:
-            type: string
-        "502":
-          description: Ошибка сервера, попробуйте позже
-          schema:
-            type: string
-      summary: SaveTemplate
-      tags:
-      - Templates
-    put:
-      consumes:
-      - application/json
       description: Изменение шаблона
       parameters:
       - description: Template
@@ -190,7 +165,7 @@ paths:
           description: Ошибка сервера, попробуйте позже
           schema:
             type: string
-      summary: SaveTemplate
+      summary: UpdateTemplate
       tags:
       - Templates
   /verification:
