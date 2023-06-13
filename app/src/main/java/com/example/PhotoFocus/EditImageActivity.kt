@@ -97,11 +97,11 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     private lateinit var textModel: TextModel
     private lateinit var editImageController: EditImageController
 
-    private var tone: Float = 0.0F
-    private var saturation: Float = 0.0F
-    private var bright: Float = 0.0F
-    private var exposition: Float = 0.0F
-    private var contrast: Float = 0.0F
+    private var tone: Float = 100.0F
+    private var saturation: Float = 100.0F
+    private var bright: Float = 100.0F
+    private var exposition: Float = 100.0F
+    private var contrast: Float = 100.0F
     private var blur: Float = 0.0F
     private var noise: Float = 0.0F
     private var vignette: Float = 0.0F

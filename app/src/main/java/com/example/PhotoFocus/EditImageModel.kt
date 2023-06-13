@@ -106,17 +106,17 @@ class EditImageModel(private val activity: EditImageActivity) {
 
         toneText = noise
 
-        val shouldApplyTone = tone != 100.0F
-        val shouldApplySaturation = saturation != 100.0F
-        val shouldApplyBright = bright != 100.0F
-        val shouldApplyExposition = exposition != 100.0F
-        val shouldApplyContrast = contrast != 100.0F
+        val shouldApplyTone = tone != 0.0F
+        val shouldApplySaturation = saturation != 0.0F
+        val shouldApplyBright = bright != 0.0F
+        val shouldApplyExposition = exposition != 0.0F
+        val shouldApplyContrast = contrast != 0.0F
         val shouldApplyBlur = blur != 0.0F
         val shouldApplyNoise = noise != 0.0F
         val shouldApplyVignette = vignette != 0.0F
 
         if (shouldApplyTone) {
-            myTone(tempBitmap, tempBitmap, tone)
+            myTone(tempBitmap, tempBitmap, (tone-100) / 10)
         }
         if (shouldApplySaturation) {
             mySaturation(tempBitmap, tempBitmap, (saturation - 100) / 10)
