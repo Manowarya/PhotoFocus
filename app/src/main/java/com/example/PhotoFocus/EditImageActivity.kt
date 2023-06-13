@@ -6,6 +6,7 @@ import android.graphics.*
 import android.os.AsyncTask
 import android.os.Bundle
 import android.text.*
+import android.view.GestureDetector
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -15,19 +16,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.PhotoFocus.databinding.EditImageBinding
-import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import com.yandex.metrica.YandexMetrica
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Float.max
 
@@ -95,11 +90,13 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     private lateinit var textModel: TextModel
     private lateinit var editImageController: EditImageController
 
-    private var tone: Float = 0.0F
-    private var saturation: Float = 1.0F
-    private var bright: Float = 0.0F
-    private var exposition: Float = 0.0F
-    private var contrast: Float = 0.0F
+    private lateinit var gestureDetector: GestureDetector
+
+    private var tone: Float = 100.0F
+    private var saturation: Float = 100.0F
+    private var bright: Float = 100.0F
+    private var exposition: Float = 100.0F
+    private var contrast: Float = 100.0F
     private var blur: Float = 0.0F
     private var noise: Float = 0.0F
     private var vignette: Float = 0.0F
@@ -210,6 +207,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                 templates()
             }
         }
+
         editText = findViewById(R.id.editText)
         editImageBinding.textBtn.setOnClickListener {
             YandexMetrica.reportEvent(MetricEventNames.STARTED_EDIT_IMAGE)
@@ -271,7 +269,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
       val viewTemplates = mutableListOf<ImageView>()
 
       CoroutineScope(Dispatchers.IO).launch {
-          val response: Response<Templates> = retrofitService.retrofit.getTemplate("10")
+          val response: Response<Templates> = retrofitService.retrofit.getTemplate(id.toString())
           val templates = response.body()?.list
           withContext(Dispatchers.Main) {
               if (response.isSuccessful) {
@@ -298,29 +296,32 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                       viewTemplates[x].setOnClickListener {
                           setDefaultSeekBar()
                           toneSeekBar?.progress = templates[x].tone.toInt()
-                          editTextTone?.setText((templates[x].tone - 100).toString())
+                          editTextTone?.setText((templates[x].tone.toInt() - 100).toString())
                           saturationSeekBar?.progress = templates[x].saturation.toInt()
-                          editTextSaturation?.setText((templates[x].saturation - 100).toString())
+                          editTextSaturation?.setText((templates[x].saturation.toInt() - 100).toString())
                           brightSeekBar?.progress = templates[x].bright.toInt()
-                          editTextBright?.setText((templates[x].bright - 100).toString())
-                          expositionSeekBar?.progress = templates[x].exposition.toInt()
-                          editTextExposition?.setText((templates[x].exposition - 100).toString())
-                          contrastSeekBar?.progress = templates[x].contrast.toInt()
-                          editTextContrast?.setText((templates[x].contrast - 100).toString())
+                          editTextBright?.setText((templates[x].bright.toInt() - 100).toString())
+                          expositionSeekBar?.progress = templates[x].exposition.toInt() + 100
+                          editTextExposition?.setText((templates[x].exposition.toInt()).toString())
+                          contrastSeekBar?.progress = templates[x].contrast.toInt() + 100
+                          editTextContrast?.setText((templates[x].contrast.toInt()).toString())
                           blurSeekBar?.progress = templates[x].blur.toInt()
                           editTextBlur?.setText(templates[x].blur.toString())
                           noiseSeekBar?.progress = templates[x].noise.toInt()
                           editTextNoise?.setText(templates[x].noise.toString())
                           vignetteSeekBar?.progress = templates[x].vignette.toInt()
-                          editTextVignette?.setText((templates[x].vignette - 100).toString())
+                          editTextVignette?.setText((templates[x].vignette).toString())
                           updateCorrectionParametrs()
                           ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
+                      }
+                      viewTemplates[x].setOnLongClickListener {
+                          showDeleteDialog()
+                          true
                       }
                   }
               }
           }
       }
-
 
 
         val sysTemplates_1 = findViewById<ImageView>(R.id.sysTemplates_1)
@@ -804,7 +805,27 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         later.setOnClickListener {
             dialog.dismiss()
         }
+        dialog.show()
+    }
 
+    private fun showDeleteDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.delete_dialog, null)
+        val alertDialogBuilder = AlertDialog.Builder(this, R.style.DialogStyle)
+        alertDialogBuilder.setView(dialogView)
+
+        val dialog = alertDialogBuilder.create()
+
+        val yes = dialogView.findViewById<Button>(R.id.dialog_yes)
+        val no = dialogView.findViewById<Button>(R.id.dialog_no)
+
+        yes.setOnClickListener {
+            //удаление шаблона
+            dialog.dismiss()
+        }
+
+        no.setOnClickListener {
+            dialog.dismiss()
+        }
         dialog.show()
     }
     @Deprecated("Deprecated in Java")

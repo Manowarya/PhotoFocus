@@ -103,7 +103,7 @@ class EditImageModel(private val activity: EditImageActivity) {
         val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
 
         val shouldApplyTone = tone > 0.0F
-        val shouldApplySaturation = saturation > 0.0F
+        val shouldApplySaturation = saturation > 1.0F
         val shouldApplyBright = bright > 0.0F
         val shouldApplyExposition = exposition > 0.0F
         val shouldApplyContrast = contrast > 0.0F
