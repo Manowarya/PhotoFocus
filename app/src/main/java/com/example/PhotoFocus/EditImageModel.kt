@@ -16,13 +16,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 
-
 class EditImageModel(private val activity: EditImageActivity) {
 
     var bitmap: Bitmap? = null
     var dstBitmap: Bitmap? = null
-    var originalWidth = 0
-    var originalHeight = 0
 
     fun loadImage(imagePath: String) {
         Glide.with(activity)
@@ -41,19 +38,6 @@ class EditImageModel(private val activity: EditImageActivity) {
             })
 
     }
-
-  /*  private fun scaleBitmap(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
-        val scaleFactor = Float.min(
-            maxWidth.toFloat() / bitmap.width,
-            maxHeight.toFloat() / bitmap.height
-        )
-
-        val newWidth = (bitmap.width * scaleFactor).toInt()
-        val newHeight = (bitmap.height * scaleFactor).toInt()
-
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-    }*/
-
     fun saveImageToGallery(bitmap: Bitmap) {
         val imageName = "photofocus_${System.currentTimeMillis()}.jpg"
         val dateTaken = System.currentTimeMillis()
@@ -100,6 +84,7 @@ class EditImageModel(private val activity: EditImageActivity) {
     }
 
     fun applyEffects(tone: Float, saturation: Float, bright: Float, exposition: Float, contrast: Float, blur: Float, noise: Float, vignette: Float): Bitmap {
+
         val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
 
         val shouldApplyTone = tone > 0.0F
