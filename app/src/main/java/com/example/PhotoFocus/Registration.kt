@@ -21,7 +21,6 @@ class Registration : AppCompatActivity() {
     private var password_text: String = ""
     private var password2_text: String = ""
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
@@ -38,7 +37,10 @@ class Registration : AppCompatActivity() {
 
             if (password_text != password2_text) {
                 Toast.makeText(this, "Пароли должны совпадать", Toast.LENGTH_SHORT).show()
-            } else {
+            } else if (password_text == "") {
+                Toast.makeText(this, "Введите пароль", Toast.LENGTH_SHORT).show()
+            }
+            else {
                 registerUser(email_text, password_text)
             }
         }
