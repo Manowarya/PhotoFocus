@@ -337,6 +337,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         userTemplates!!.setOnClickListener {
             handleTextViewClick(userTemplates!!)
             linearLayoutVisible(templatesUserLayout!!)
+            Toast.makeText(this, "Для удаления нажмите и удерживайте нужный шаблон", Toast.LENGTH_SHORT).show()
         }
         setTextToSmallImageView(sysTemplates_1, ResourcesCompat.getFont(this, R.font.nevduplenysh_regular), "Оригинал")
         setTextToSmallImageView(sysTemplates_2, ResourcesCompat.getFont(this, R.font.nevduplenysh_regular), "Ч/Б")
@@ -832,7 +833,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                     return
                 }
             }
-            override fun onFailure(call: Call<String>?, t: Throwable?) {}
+            override fun onFailure(call: Call<String>, t: Throwable) {}
         })
     }
 

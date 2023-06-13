@@ -87,27 +87,32 @@ class UserTemplates : AppCompatActivity() {
             startActivity(intent)
         }
         btnSave.setOnClickListener {
-            var name = nameTemplates?.text.toString()
-            if (name == ""){
-                Toast.makeText(this@UserTemplates, "Введите название", Toast.LENGTH_SHORT).show();
-            } else {
-                saveTemplate(
-                    name,
-                    id,
-                    tone,
-                    saturation,
-                    bright,
-                    exposition,
-                    contrast,
-                    blur,
-                    noise,
-                    vignette
-                )
+            when (val name = nameTemplates?.text.toString()) {
+                "" -> {
+                    Toast.makeText(this@UserTemplates, "Введите название", Toast.LENGTH_SHORT).show()
+                }
+                nameChangeTemplates -> {
+                    Toast.makeText(this@UserTemplates, "Имя нового шаблона не должно совпадать с уже созданными", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    saveTemplate(
+                        name,
+                        id,
+                        tone,
+                        saturation,
+                        bright,
+                        exposition,
+                        contrast,
+                        blur,
+                        noise,
+                        vignette
+                    )
+                }
             }
         }
     }
 
-    fun saveTemplate(
+    private fun saveTemplate(
         name: String,
         userId: String,
         tone: Float,
@@ -153,7 +158,7 @@ class UserTemplates : AppCompatActivity() {
                     return
                 }
             }
-            override fun onFailure(call: Call<String>?, t: Throwable?) {}
+            override fun onFailure(call: Call<String>, t: Throwable) {}
         })
     }
 }

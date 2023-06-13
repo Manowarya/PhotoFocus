@@ -125,10 +125,10 @@ class EditImageModel(private val activity: EditImageActivity) {
             myBright(tempBitmap, tempBitmap, (bright - 100)/10)
         }
         if (shouldApplyExposition) {
-            myExposition(tempBitmap, tempBitmap, exposition / 10)
+            myExposition(tempBitmap, tempBitmap, (exposition-100) / 10)
         }
         if (shouldApplyContrast) {
-            myContrast(tempBitmap, tempBitmap, contrast / 10)
+            myContrast(tempBitmap, tempBitmap, (contrast-100) / 10)
         }
         if (shouldApplyBlur) {
             myBlur(tempBitmap, tempBitmap, blur / 10)
