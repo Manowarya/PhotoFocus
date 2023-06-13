@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.drawToBitmap
 import com.example.PhotoFocus.databinding.EditImageBinding
 import com.google.gson.annotations.SerializedName
 import com.yandex.metrica.YandexMetrica
@@ -260,6 +261,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val vignette:   Float
     )
 
+    var viewTemplates: MutableList<ImageView>? = null
+  @SuppressLint("SuspiciousIndentation")
   private fun templates() {
         saveBtn!!.visibility=View.GONE
         templatesBtnsLayout = findViewById(R.id.templatesBtnsLayout)
@@ -270,63 +273,55 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         templatesSysLayout = findViewById(R.id.templatesSysLayout)
         val templatesUserLayout = findViewById<LinearLayout>(R.id.templatesUserLayout)
 
-      val viewTemplates = mutableListOf<ImageView>()
+        viewTemplates = mutableListOf()
 
-      CoroutineScope(Dispatchers.IO).launch {
-          val response: Response<Templates> = retrofitService.retrofit.getTemplate(id.toString())
-          val templates = response.body()?.list
-          withContext(Dispatchers.Main) {
-              if (response.isSuccessful) {
-                  for(x in templates!!.indices) {
-                      if (x == 0) {
-                          viewTemplates.add(findViewById(R.id.userTemplates_1))
+          CoroutineScope(Dispatchers.IO).launch {
+              val response: Response<Templates> = retrofitService.retrofit.getTemplate(id.toString())
+              val templates = response.body()?.list
+              withContext(Dispatchers.Main) {
+                  if (response.isSuccessful && templates != null) {
+                      for(x in templates.indices) {
+                          val viewTemplateId = resources.getIdentifier("userTemplates_${x+1}", "id", packageName)
+                          viewTemplates!!.add(findViewById(viewTemplateId))
+
+                          setTextToSmallImageView(viewTemplates!![x], ResourcesCompat.getFont(this@EditImageActivity, R.font.nevduplenysh_regular), templates[x].name)
+                          viewTemplates!![x].setOnClickListener {
+                              nameChangeTemplates = templates[x].name
+                              setDefaultSeekBar()
+                              toneSeekBar?.progress = templates[x].tone.toInt()
+                              editTextTone?.setText((templates[x].tone.toInt() - 100).toString())
+                              saturationSeekBar?.progress = templates[x].saturation.toInt()
+                              editTextSaturation?.setText((templates[x].saturation.toInt() - 100).toString())
+                              brightSeekBar?.progress = templates[x].bright.toInt()
+                              editTextBright?.setText((templates[x].bright.toInt() - 100).toString())
+                              expositionSeekBar?.progress = templates[x].exposition.toInt() + 100
+                              editTextExposition?.setText((templates[x].exposition.toInt()).toString())
+                              contrastSeekBar?.progress = templates[x].contrast.toInt() + 100
+                              editTextContrast?.setText((templates[x].contrast.toInt()).toString())
+                              blurSeekBar?.progress = templates[x].blur.toInt()
+                              editTextBlur?.setText(templates[x].blur.toString())
+                              noiseSeekBar?.progress = templates[x].noise.toInt()
+                              editTextNoise?.setText(templates[x].noise.toString())
+                              vignetteSeekBar?.progress = templates[x].vignette.toInt()
+                              editTextVignette?.setText((templates[x].vignette).toString())
+                              updateCorrectionParametrs()
+                              ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
+                          }
+                          viewTemplates!![x].setOnLongClickListener {
+                              showDeleteDialog(templates[x].name, x)
+                              true
+                          }
                       }
-                      if (x == 1) {
-                          viewTemplates.add(findViewById(R.id.userTemplates_2))
-                      }
-                      if (x == 2) {
-                          viewTemplates.add(findViewById(R.id.userTemplates_3))
-                      }
-                      if (x == 3) {
-                          viewTemplates.add(findViewById(R.id.userTemplates_4))
-                      }
-                      if (x == 4) {
-                          viewTemplates.add(findViewById(R.id.userTemplates_5))
-                      }
-                      if (x == 5) {
-                          viewTemplates.add(findViewById(R.id.userTemplates_6))
-                      }
-                      setTextToSmallImageView(viewTemplates[x], ResourcesCompat.getFont(this@EditImageActivity, R.font.nevduplenysh_regular), templates[x].name)
-                      viewTemplates[x].setOnClickListener {
-                          nameChangeTemplates = templates[x].name
-                          setDefaultSeekBar()
-                          toneSeekBar?.progress = templates[x].tone.toInt()
-                          editTextTone?.setText((templates[x].tone.toInt() - 100).toString())
-                          saturationSeekBar?.progress = templates[x].saturation.toInt()
-                          editTextSaturation?.setText((templates[x].saturation.toInt() - 100).toString())
-                          brightSeekBar?.progress = templates[x].bright.toInt()
-                          editTextBright?.setText((templates[x].bright.toInt() - 100).toString())
-                          expositionSeekBar?.progress = templates[x].exposition.toInt() + 100
-                          editTextExposition?.setText((templates[x].exposition.toInt()).toString())
-                          contrastSeekBar?.progress = templates[x].contrast.toInt() + 100
-                          editTextContrast?.setText((templates[x].contrast.toInt()).toString())
-                          blurSeekBar?.progress = templates[x].blur.toInt()
-                          editTextBlur?.setText(templates[x].blur.toString())
-                          noiseSeekBar?.progress = templates[x].noise.toInt()
-                          editTextNoise?.setText(templates[x].noise.toString())
-                          vignetteSeekBar?.progress = templates[x].vignette.toInt()
-                          editTextVignette?.setText((templates[x].vignette).toString())
-                          updateCorrectionParametrs()
-                          ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
-                      }
-                      viewTemplates[x].setOnLongClickListener {
-                          showDeleteDialog(templates[x].name)
-                          true
-                      }
+                  } else {
+                      viewTemplates!!.add(findViewById(R.id.userTemplates_1))
+                      viewTemplates!!.add(findViewById(R.id.userTemplates_2))
+                      viewTemplates!!.add(findViewById(R.id.userTemplates_3))
+                      viewTemplates!!.add(findViewById(R.id.userTemplates_4))
+                      viewTemplates!!.add(findViewById(R.id.userTemplates_5))
+                      viewTemplates!!.add(findViewById(R.id.userTemplates_6))
                   }
               }
           }
-      }
 
         val sysTemplates_1 = findViewById<ImageView>(R.id.sysTemplates_1)
         val sysTemplates_2 = findViewById<ImageView>(R.id.sysTemplates_2)
@@ -635,14 +630,14 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         vignetteSeekBar!!.progress = 0
     }
     private fun updateCorrectionParametrs(){
-        tone = max(0.1F, toneSeekBar!!.progress / 10F)
-        saturation = max(0.1F, saturationSeekBar!!.progress / 10F)
-        bright = max(0.1F, brightSeekBar!!.progress / 10F)
-        exposition = max(0.1F, expositionSeekBar!!.progress / 10F)
+        tone = max(0.0F, toneSeekBar!!.progress / 10F)
+        saturation = max(0.0F, saturationSeekBar!!.progress / 10F)
+        bright = max(0.0F, brightSeekBar!!.progress / 10F)
+        exposition = max(0.0F, expositionSeekBar!!.progress / 10F)
         contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
-        blur = max(0.1F, blurSeekBar!!.progress / 1F)
-        noise = max(0.1F, noiseSeekBar!!.progress / 10F)
-        vignette = max(0.1F, vignetteSeekBar!!.progress / 10F)
+        blur = max(0.0F, blurSeekBar!!.progress / 1F)
+        noise = max(0.0F, noiseSeekBar!!.progress / 10F)
+        vignette = max(0.0F, vignetteSeekBar!!.progress / 10F)
     }
     private fun handleTextViewClick(textView: TextView) {
         selectedTextView?.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
@@ -693,9 +688,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
         when (seekBar) {
             toneSeekBar -> {
-
                 editTextTone!!.setText((seekBar!!.progress - 100).toString())
-                editImageController.test()
             }
             saturationSeekBar -> {
                 editTextSaturation!!.setText((seekBar!!.progress - 100).toString())
@@ -842,7 +835,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         })
     }
 
-    private fun showDeleteDialog(name: String) {
+    private fun showDeleteDialog(name: String, x: Int) {
         val dialogView = layoutInflater.inflate(R.layout.delete_dialog, null)
         val alertDialogBuilder = AlertDialog.Builder(this, R.style.DialogStyle)
         alertDialogBuilder.setView(dialogView)
@@ -854,6 +847,10 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         yes.setOnClickListener {
             deleteTemplate(name, id!!.toInt())
+            for (i in x until viewTemplates!!.size - 1) {
+                viewTemplates!![i].setImageBitmap(viewTemplates!![i + 1].drawToBitmap())
+            }
+            viewTemplates!![viewTemplates!!.size - 1].setImageResource(0)
             dialog.dismiss()
         }
 
@@ -862,6 +859,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         }
         dialog.show()
     }
+
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (screenStack.isNotEmpty()) {

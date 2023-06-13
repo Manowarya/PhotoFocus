@@ -104,7 +104,7 @@ class EditImageModel(private val activity: EditImageActivity) {
     fun applyEffects(tone: Float, saturation: Float, bright: Float, exposition: Float, contrast: Float, blur: Float, noise: Float, vignette: Float): Bitmap {
         val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
 
-        toneText = tone
+        toneText = noise
 
         val shouldApplyTone = tone != 10.0F
         val shouldApplySaturation = saturation != 10.0F

@@ -88,7 +88,22 @@ class UserTemplates : AppCompatActivity() {
         }
         btnSave.setOnClickListener {
             var name = nameTemplates?.text.toString()
-            saveTemplate(name, id, tone, saturation, bright, exposition, contrast, blur, noise, vignette)
+            if (name == ""){
+                Toast.makeText(this@UserTemplates, "Введите название", Toast.LENGTH_SHORT).show();
+            } else {
+                saveTemplate(
+                    name,
+                    id,
+                    tone,
+                    saturation,
+                    bright,
+                    exposition,
+                    contrast,
+                    blur,
+                    noise,
+                    vignette
+                )
+            }
         }
     }
 
