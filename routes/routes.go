@@ -77,6 +77,26 @@ func SaveTemplate(db *sql.DB) echo.HandlerFunc {
 	}
 }
 
+// UpdateTemplate изменяет шаблон.
+// @Summary SaveTemplate
+// @Description Изменение шаблона
+// @Tags Templates
+// @Accept  json
+// @Produce  json
+// @Param template body model.Template true "Template"
+// @Success 201 {string} string "Шаблон изменен"
+// @Failure 502 {string} string "Ошибка сервера, попробуйте позже"
+// @Router /save-template [put]
+func UpdateTemplate(db *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if err := model.UpdateTemplate(db, c); err != nil {
+			return c.JSON(http.StatusBadGateway, "Ошибка сервера, попробуйте позже")
+
+		}
+		return c.JSON(http.StatusCreated, "Шаблон изменен")
+	}
+}
+
 func DeleteTemplate(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := model.DeleteTemplate(db, c); err != nil {

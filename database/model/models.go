@@ -73,12 +73,24 @@ func SaveTemplate(db *sql.DB, c echo.Context) error {
 	return err
 }
 
+func UpdateTemplate(db *sql.DB, c echo.Context) error {
+	template := new(Template)
+	if err := c.Bind(template); err != nil {
+		return err
+	}
+
+	updateQuery := "UPDATE templates SET tone = ?, saturation= ?, bright= ?, exposition= ?, contrast= ?, blur= ?, noise= ?, vignette= ? WHERE user_id=? and name = ?"
+	_, err := db.Exec(updateQuery, template.Tone, template.Saturation, template.Bright, template.Exposition, template.Contrast, template.Blur, template.Noise, template.Vignette, template.UserId, template.Name)
+
+	return err
+}
+
 func DeleteTemplate(db *sql.DB, c echo.Context) error {
 	template := new(Template)
 	if err := c.Bind(template); err != nil {
 		return err
 	}
-	_, err := db.Query("DELETE FROM templates WHERE user_id=? and name = ?", template.UserId, template.Name)
+	_, err := db.Exec("DELETE FROM templates WHERE user_id=? and name = ?", template.UserId, template.Name)
 
 	return err
 }

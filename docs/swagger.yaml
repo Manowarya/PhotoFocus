@@ -47,7 +47,7 @@ host: photofocus-production.up.railway.app
 info:
   contact: {}
   title: PhotoFocus API
-  version: 1.0.4
+  version: 1.0.5
 paths:
   /authorization:
     post:
@@ -159,6 +159,31 @@ paths:
       responses:
         "201":
           description: Шаблон успешно создан
+          schema:
+            type: string
+        "502":
+          description: Ошибка сервера, попробуйте позже
+          schema:
+            type: string
+      summary: SaveTemplate
+      tags:
+      - Templates
+    put:
+      consumes:
+      - application/json
+      description: Изменение шаблона
+      parameters:
+      - description: Template
+        in: body
+        name: template
+        required: true
+        schema:
+          $ref: '#/definitions/model.Template'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Шаблон изменен
           schema:
             type: string
         "502":

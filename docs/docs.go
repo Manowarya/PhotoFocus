@@ -159,6 +159,44 @@ const docTemplate = `{
             }
         },
         "/save-template": {
+            "put": {
+                "description": "Изменение шаблона",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "SaveTemplate",
+                "parameters": [
+                    {
+                        "description": "Template",
+                        "name": "template",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Template"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Шаблон изменен",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "502": {
+                        "description": "Ошибка сервера, попробуйте позже",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Создание нового шаблона",
                 "consumes": [
@@ -325,7 +363,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0.4",
+	Version:          "1.0.5",
 	Host:             "photofocus-production.up.railway.app",
 	BasePath:         "",
 	Schemes:          []string{},
