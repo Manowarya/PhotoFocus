@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
@@ -99,17 +100,20 @@ class EditImageModel(private val activity: EditImageActivity) {
         myAutocorrect(dstBitmap!!, dstBitmap!!)
     }
 
+    var toneText: Float? = null
     fun applyEffects(tone: Float, saturation: Float, bright: Float, exposition: Float, contrast: Float, blur: Float, noise: Float, vignette: Float): Bitmap {
         val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
 
-        val shouldApplyTone = tone > 0.0F
-        val shouldApplySaturation = saturation > 1.0F
-        val shouldApplyBright = bright > 0.0F
-        val shouldApplyExposition = exposition > 0.0F
-        val shouldApplyContrast = contrast > 0.0F
-        val shouldApplyBlur = blur > 0.0F
-        val shouldApplyNoise = noise > 0.0F
-        val shouldApplyVignette = vignette > 0.0F
+        toneText = tone
+
+        val shouldApplyTone = tone != 10.0F
+        val shouldApplySaturation = saturation != 10.0F
+        val shouldApplyBright = bright != 10.0F
+        val shouldApplyExposition = exposition != 10.0F
+        val shouldApplyContrast = contrast != 10.0F
+        val shouldApplyBlur = blur != 0.0F
+        val shouldApplyNoise = noise != 0.0F
+        val shouldApplyVignette = vignette != 0.0F
 
         if (shouldApplyTone) {
             myTone(tempBitmap, tempBitmap, tone - 10F)

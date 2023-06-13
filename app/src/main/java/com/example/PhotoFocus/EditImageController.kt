@@ -15,4 +15,8 @@ class EditImageController(private val activity: EditImageActivity, private val m
         model.myAutocorrect()
         activity.showImage(bitmap!!)
     }
+    fun test() {
+        val tone = model.toneText
+        activity.showMessage(tone.toString())
+    }
 }

@@ -56,7 +56,7 @@
     <string name="create_templates">Создать шаблон</string>
     <string name="question_templates">Хотите сохранить текущие настройки обработки в \"Пользовательские шаблоны\"?</string>
     <string name="yes">Да</string>
-    <string name="applyChange"><![CDATA[Применить изменения к \"%s</string>\" или создать новый шаблон?]]></string>
+    <string name="applyChange"><![CDATA[Применить изменения  к \n \"%s\" \n или создать новый шаблон?]]></string>
     <string name="create_new">Создать новый</string>
     <string name="apply">Применить</string>
 </resources>

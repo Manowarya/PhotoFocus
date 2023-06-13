@@ -85,18 +85,17 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
     var screen : String? = null
     var id : String? = null
+    var nameChangeTemplates: String? = null
 
     private lateinit var editImageModel: EditImageModel
     private lateinit var textModel: TextModel
     private lateinit var editImageController: EditImageController
 
-    private lateinit var gestureDetector: GestureDetector
-
-    private var tone: Float = 100.0F
-    private var saturation: Float = 100.0F
-    private var bright: Float = 100.0F
-    private var exposition: Float = 100.0F
-    private var contrast: Float = 100.0F
+    private var tone: Float = 10.0F
+    private var saturation: Float = 10.0F
+    private var bright: Float = 10.0F
+    private var exposition: Float = 10.0F
+    private var contrast: Float = 10.0F
     private var blur: Float = 0.0F
     private var noise: Float = 0.0F
     private var vignette: Float = 0.0F
@@ -294,6 +293,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                       }
                       setTextToSmallImageView(viewTemplates[x], ResourcesCompat.getFont(this@EditImageActivity, R.font.nevduplenysh_regular), templates[x].name)
                       viewTemplates[x].setOnClickListener {
+                          nameChangeTemplates = templates[x].name
                           setDefaultSeekBar()
                           toneSeekBar?.progress = templates[x].tone.toInt()
                           editTextTone?.setText((templates[x].tone.toInt() - 100).toString())
@@ -322,7 +322,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
               }
           }
       }
-
 
         val sysTemplates_1 = findViewById<ImageView>(R.id.sysTemplates_1)
         val sysTemplates_2 = findViewById<ImageView>(R.id.sysTemplates_2)
@@ -632,7 +631,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     }
     private fun updateCorrectionParametrs(){
         tone = max(0.1F, toneSeekBar!!.progress / 10F)
-        saturation = max(1.0F, saturationSeekBar!!.progress / 10F)
+        saturation = max(0.1F, saturationSeekBar!!.progress / 10F)
         bright = max(0.1F, brightSeekBar!!.progress / 10F)
         exposition = max(0.1F, expositionSeekBar!!.progress / 10F)
         contrast = max(0.1F, contrastSeekBar!!.progress / 10F)
@@ -689,7 +688,9 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
         when (seekBar) {
             toneSeekBar -> {
+
                 editTextTone!!.setText((seekBar!!.progress - 100).toString())
+                editImageController.test()
             }
             saturationSeekBar -> {
                 editTextSaturation!!.setText((seekBar!!.progress - 100).toString())
@@ -886,6 +887,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             bundle.putFloat("blur", blur)
             bundle.putFloat("noise", noise)
             bundle.putFloat("vignette", vignette)
+            bundle.putString("nameChangeTemplates", nameChangeTemplates)
             intent.putExtras(bundle)
         } else {
             intent = Intent(this, GalleryActivity::class.java)

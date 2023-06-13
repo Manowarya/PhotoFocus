@@ -11,8 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -67,7 +66,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -118,5 +118,63 @@
             app:cornerRadius="@dimen/_20sdp" />
 
     </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/changeTemplatesQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+     >
+        <TextView
+            android:id="@+id/textChange"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/applyChange"
+            android:layout_marginHorizontal="@dimen/_30sdp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_16sdp"
+            android:layout_marginVertical="@dimen/_20sdp"
+            android:textStyle="bold"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="@dimen/_20sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnApply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:text="@string/apply"
+                android:layout_gravity="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                app:strokeColor="@color/button"
+                app:cornerRadius="@dimen/_20sdp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCreateNew"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/create_new"
+                android:layout_gravity="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                app:strokeColor="@color/button"
+                app:cornerRadius="@dimen/_20sdp" />
+
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

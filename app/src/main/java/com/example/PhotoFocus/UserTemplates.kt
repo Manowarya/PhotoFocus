@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,8 @@ import retrofit2.Response
 class UserTemplates : AppCompatActivity() {
     private var templatesQuestion: LinearLayout? = null
     private var createTemplates: LinearLayout? = null
+    private var changeTemplates: LinearLayout? = null
+    private var textChange: TextView? = null
 
     private var nameTemplates: EditText? = null
 
@@ -34,26 +37,48 @@ class UserTemplates : AppCompatActivity() {
 
         templatesQuestion = findViewById(R.id.templatesQuestion)
         createTemplates = findViewById(R.id.createTemplates)
+        changeTemplates = findViewById(R.id.changeTemplatesQuestion)
+        textChange = findViewById(R.id.textChange)
 
         val id = intent.getStringExtra("id").toString().replace("\n", "")
 
-        val tone = intent.getFloatExtra("tone", 100.0F)
-        val saturation = intent.getFloatExtra("saturation", 100.0F)
-        val bright = intent.getFloatExtra("bright", 100.0F)
-        val exposition = intent.getFloatExtra("exposition", 100.0F)
-        val contrast = intent.getFloatExtra("contrast", 100.0F)
+        val tone = intent.getFloatExtra("tone", 10.0F)
+        val saturation = intent.getFloatExtra("saturation", 10.0F)
+        val bright = intent.getFloatExtra("bright", 10.0F)
+        val exposition = intent.getFloatExtra("exposition", 10.0F)
+        val contrast = intent.getFloatExtra("contrast", 10.0F)
         val blur = intent.getFloatExtra("blur", 0.0F)
         val noise = intent.getFloatExtra("noise", 0.0F)
         val vignette = intent.getFloatExtra("vignette", 0.0F)
+
+        val nameChangeTemplates = intent.getStringExtra("nameChangeTemplates")
 
         nameTemplates = findViewById(R.id.nameTemplates)
         val btnYes = findViewById<Button>(R.id.btnYes)
         val btnNo = findViewById<Button>(R.id.btnNo)
         val btnSave = findViewById<Button>(R.id.btnCreateTemplates)
+        val btnApply = findViewById<Button>(R.id.btnApply)
+        val btnCreateNew = findViewById<Button>(R.id.btnCreateNew)
 
         btnYes.setOnClickListener {
-            templatesQuestion?.visibility = View.GONE
-            createTemplates?.visibility = View.VISIBLE
+            if (nameChangeTemplates != null) {
+                templatesQuestion?.visibility = View.GONE
+                changeTemplates?.visibility = View.VISIBLE
+                val text = textChange?.text.toString()
+                val formatText = String.format(text, nameChangeTemplates)
+                textChange!!.text = formatText
+                btnApply.setOnClickListener {
+                    changeTemplates?.visibility = View.GONE
+                    //вызов функции для изменения
+                }
+                btnCreateNew.setOnClickListener {
+                    changeTemplates?.visibility = View.GONE
+                    createTemplates?.visibility = View.VISIBLE
+                }
+            } else {
+                templatesQuestion?.visibility = View.GONE
+                createTemplates?.visibility = View.VISIBLE
+            }
         }
 
         btnNo.setOnClickListener {
