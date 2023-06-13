@@ -20,4 +20,4 @@
 
 [Видеопрезентация проекта](https://github.com/Manowarya/PhotoFocus/blob/main/documentation/Видеопрезентация.rar)
 
-[Swagger](photofocus-production.up.railway.app/swagger)
+[Swagger документация](photofocus-production.up.railway.app/swagger)
