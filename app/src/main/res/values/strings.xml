@@ -51,7 +51,7 @@
     <string name="password2">Повторите пароль</string>
     <string name="enter_code2">Введите код</string>
     <string name="later">Позже</string>
-    <string name="templates_name">Введите название шаблона</string>
+    <string name="templates_name">Введите название шаблона \n (не больше 8 символов)</string>
     <string name="name_templates2">Название шаблона</string>
     <string name="create_templates">Создать шаблон</string>
     <string name="question_templates">Хотите сохранить текущие настройки обработки в \"Пользовательские шаблоны\"?</string>
