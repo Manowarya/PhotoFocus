@@ -23,6 +23,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Float.max
 
@@ -315,7 +320,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                           ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
                       }
                       viewTemplates[x].setOnLongClickListener {
-                          showDeleteDialog()
+                          showDeleteDialog(templates[x].name)
                           true
                       }
                   }
@@ -809,7 +814,35 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         dialog.show()
     }
 
-    private fun showDeleteDialog() {
+    fun deleteTemplate(name: String, id: Int){
+        val jsonObject = JSONObject()
+        jsonObject.put("name", name)
+        jsonObject.put("user_id", id)
+
+        val body = RequestBody.create(
+            "application/json".toMediaTypeOrNull(),
+            jsonObject.toString()
+        )
+        retrofitService.retrofit.deleteTemplate(body).enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if (response.code() == 201) {
+                    Toast.makeText(this@EditImageActivity,
+                        "Шаблон удален",
+                        Toast.LENGTH_SHORT).show();
+                    return
+                }
+                if (response.code() == 502) {
+                    Toast.makeText(this@EditImageActivity,
+                        "Ошибка сервера, попробуйте позже",
+                        Toast.LENGTH_SHORT).show();
+                    return
+                }
+            }
+            override fun onFailure(call: Call<String>?, t: Throwable?) {}
+        })
+    }
+
+    private fun showDeleteDialog(name: String) {
         val dialogView = layoutInflater.inflate(R.layout.delete_dialog, null)
         val alertDialogBuilder = AlertDialog.Builder(this, R.style.DialogStyle)
         alertDialogBuilder.setView(dialogView)
@@ -820,7 +853,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         val no = dialogView.findViewById<Button>(R.id.dialog_no)
 
         yes.setOnClickListener {
-            //удаление шаблона
+            deleteTemplate(name, id!!.toInt())
             dialog.dismiss()
         }
 

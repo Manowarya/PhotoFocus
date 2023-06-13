@@ -13,6 +13,9 @@ interface ApiService {
     @GET("/get-templates/{id}")
     suspend fun getTemplate(@Path("id") id: String): Response<EditImageActivity.Templates>
 
+    @POST("/delete-template")
+    fun deleteTemplate(@Body requestBody: RequestBody): Call<String>
+
     @POST("/save-template")
     fun saveTemplate(@Body requestBody: RequestBody): Call<String>
 
