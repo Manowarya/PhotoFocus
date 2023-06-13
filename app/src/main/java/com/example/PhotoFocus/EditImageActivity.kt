@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.drawToBitmap
 import com.example.PhotoFocus.databinding.EditImageBinding
 import com.yandex.metrica.YandexMetrica
 import java.lang.Float.max
@@ -109,6 +110,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         YandexMetrica.reportEvent(MetricEventNames.VISITED_EDIT_SCREEN)
 
         toolsLayout = findViewById(R.id.toolsLayout)
+
+        val cropView = editImageBinding.cropImageView
 
         screen = intent.getStringExtra("screen")
         editImageBinding.cropBtn.setOnClickListener {
@@ -403,7 +406,6 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         saveBtn!!.visibility = View.GONE
         cropTools!!.visibility = View.VISIBLE
         editImageBinding.cropImageView.setImageBitmap(dstBitmap)
-        editImageBinding.imagePreview.setImageResource(0)
 
         handleTextViewClick(fixcropping)
 
@@ -455,6 +457,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         backBtn?.setOnClickListener{
             onBackPressed()
         }
+
     }
 
     private fun correction() {
@@ -728,6 +731,8 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                     cropTools!!.visibility = View.GONE
                     dstBitmap = editImageBinding.cropImageView.getCroppedImage()!!
                     editImageBinding.imagePreview.setImageBitmap(dstBitmap)
+                    editImageModel.bitmap = editImageBinding.cropImageView.getCroppedImage()!!
+                    editImageModel.dstBitmap = editImageBinding.cropImageView.getCroppedImage()!!
                     editImageBinding.cropImageView.clearImage()
                 }
                 "correction" -> {
