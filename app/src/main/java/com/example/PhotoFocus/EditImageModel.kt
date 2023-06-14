@@ -116,10 +116,10 @@ class EditImageModel(private val activity: EditImageActivity) {
             myContrast(tempBitmap, tempBitmap, (contrast-100) / 10)
         }
         if (shouldApplyBlur) {
-            myBlur(tempBitmap, tempBitmap, blur / 10)
+            myBlur(tempBitmap, tempBitmap, blur)
         }
         if (shouldApplyNoise) {
-            myNoise(tempBitmap, tempBitmap, noise / 10)
+            myNoise(tempBitmap, tempBitmap, noise)
         }
         if (shouldApplyVignette) {
             myVignette(tempBitmap, tempBitmap, vignette / 10)
