@@ -1,4 +1,13 @@
 definitions:
+  model.Font:
+    properties:
+      font:
+        items:
+          type: integer
+        type: array
+      font_id:
+        type: integer
+    type: object
   model.Template:
     properties:
       blur:
@@ -116,6 +125,31 @@ paths:
       summary: DeleteTemplate
       tags:
       - Templates
+  /get-font/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Отправляет шрифт по индефикатору
+      parameters:
+      - description: Font ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Font'
+        "502":
+          description: Ошибка сервера, попробуйте позже
+          schema:
+            type: string
+      summary: GetFont
+      tags:
+      - Fonts
   /get-templates/{id}:
     get:
       consumes:

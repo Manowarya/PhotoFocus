@@ -41,6 +41,27 @@ func (s *smtpServer) Address() string {
 	return s.host + ":" + s.port
 }
 
+// GetFont отправляет шрифт.
+// @Summary GetFont
+// @Description Отправляет шрифт по индефикатору
+// @Tags Fonts
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Font ID"
+// @Success 200 {object} model.Font
+// @Failure 502 {string} string "Ошибка сервера, попробуйте позже"
+// @Router /get-font/{id} [get]
+func GetFont(db *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.Param("id")
+		font, err := model.GetFont(db, id)
+		if err != nil {
+			return c.JSON(http.StatusBadGateway, "Ошибка сервера, попробуйте позже")
+		}
+		return c.JSON(http.StatusOK, font)
+	}
+}
+
 // GetTemplate отправляет шаблон.
 // @Summary GetTemplate
 // @Description Отправляет шаблон по индефикатору пользователя
