@@ -12,7 +12,7 @@
 
 [Таск-менеджер](https://bobrovskaya.youtrack.cloud/agiles/141-2/current)
 
-[Курсовая работа](https://github.com/Manowarya/PhotoFocus/blob/main/documentation/Technical%20specification_PhotoFocus.pdf)
+[Курсовая работа](https://github.com/Manowarya/PhotoFocus/blob/main/documentation/TP_Bobrovskaya_Pavlov_Karasev.pdf)
 
 [Диаграммы](https://github.com/Manowarya/PhotoFocus/tree/main/documentation/diagrams)
 
