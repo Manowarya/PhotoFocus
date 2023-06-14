@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
-class GalleryAdapter(private var context: Context, private var imagesList: ArrayList<Image>, val screen: String?):RecyclerView.Adapter<GalleryAdapter.ImageViewHolder>() {
+class GalleryAdapter(private var context: Context, private var imagesList: ArrayList<Image>, val screen: String?, val id: String?):RecyclerView.Adapter<GalleryAdapter.ImageViewHolder>() {
    class ImageViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
        var image: ImageView?=null
 
@@ -37,6 +37,7 @@ class GalleryAdapter(private var context: Context, private var imagesList: Array
             val intent = Intent(context, EditImageActivity::class.java)
             intent.putExtra("path", currentImage.imagePath)
             if (screen == "authorization") {
+                intent.putExtra("id", id)
                 intent.putExtra("screen", "authorization")
             } else {
                 intent.putExtra("screen", "guest")
