@@ -20,6 +20,11 @@ type UserWithCode struct {
 	Code  string `json:"code"`
 }
 
+type TemplateID struct {
+	Name   string `json:"name"`
+	UserId int64  `json:"user_id"`
+}
+
 type TemporaryСode struct {
 	password string
 	code     string
@@ -86,7 +91,7 @@ func SaveTemplate(db *sql.DB) echo.HandlerFunc {
 // @Param template body model.Template true "Template"
 // @Success 201 {string} string "Шаблон изменен"
 // @Failure 502 {string} string "Ошибка сервера, попробуйте позже"
-// @Router /save-template [post]
+// @Router /update-template [post]
 func UpdateTemplate(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := model.UpdateTemplate(db, c); err != nil {
@@ -97,6 +102,16 @@ func UpdateTemplate(db *sql.DB) echo.HandlerFunc {
 	}
 }
 
+// DeleteTemplate удаляет шаблон.
+// @Summary DeleteTemplate
+// @Description Удаление шаблона
+// @Tags Templates
+// @Accept  json
+// @Produce  json
+// @Param template body TemplateID true "TemplateID"
+// @Success 201 {string} string "Шаблон удален"
+// @Failure 502 {string} string "Ошибка сервера, попробуйте позже"
+// @Router /delete-template [post]
 func DeleteTemplate(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := model.DeleteTemplate(db, c); err != nil {

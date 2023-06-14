@@ -16,7 +16,7 @@ import (
 )
 
 // @title PhotoFocus API
-// @version 1.0.5
+// @version 1.0.0
 
 // @host photofocus-production.up.railway.app
 

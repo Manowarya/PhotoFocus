@@ -68,6 +68,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/delete-template": {
+            "post": {
+                "description": "Удаление шаблона",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "DeleteTemplate",
+                "parameters": [
+                    {
+                        "description": "TemplateID",
+                        "name": "template",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/routes.TemplateID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Шаблон удален",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "502": {
+                        "description": "Ошибка сервера, попробуйте позже",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/get-templates/{id}": {
             "get": {
                 "description": "Отправляет шаблон по индефикатору пользователя",
@@ -159,6 +199,46 @@ const docTemplate = `{
             }
         },
         "/save-template": {
+            "post": {
+                "description": "Создание нового шаблона",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "SaveTemplate",
+                "parameters": [
+                    {
+                        "description": "Template",
+                        "name": "template",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Template"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Шаблон успешно создан",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "502": {
+                        "description": "Ошибка сервера, попробуйте позже",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/update-template": {
             "post": {
                 "description": "Изменение шаблона",
                 "consumes": [
@@ -309,6 +389,17 @@ const docTemplate = `{
                 }
             }
         },
+        "routes.TemplateID": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "routes.UserWithCode": {
             "type": "object",
             "properties": {
@@ -325,7 +416,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0.5",
+	Version:          "1.0.0",
 	Host:             "photofocus-production.up.railway.app",
 	BasePath:         "",
 	Schemes:          []string{},

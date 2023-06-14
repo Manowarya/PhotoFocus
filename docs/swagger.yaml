@@ -36,6 +36,13 @@ definitions:
       password:
         type: string
     type: object
+  routes.TemplateID:
+    properties:
+      name:
+        type: string
+      user_id:
+        type: integer
+    type: object
   routes.UserWithCode:
     properties:
       code:
@@ -47,7 +54,7 @@ host: photofocus-production.up.railway.app
 info:
   contact: {}
   title: PhotoFocus API
-  version: 1.0.5
+  version: 1.0.0
 paths:
   /authorization:
     post:
@@ -83,6 +90,32 @@ paths:
       summary: AuthorizationUser
       tags:
       - User
+  /delete-template:
+    post:
+      consumes:
+      - application/json
+      description: Удаление шаблона
+      parameters:
+      - description: TemplateID
+        in: body
+        name: template
+        required: true
+        schema:
+          $ref: '#/definitions/routes.TemplateID'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Шаблон удален
+          schema:
+            type: string
+        "502":
+          description: Ошибка сервера, попробуйте позже
+          schema:
+            type: string
+      summary: DeleteTemplate
+      tags:
+      - Templates
   /get-templates/{id}:
     get:
       consumes:
@@ -143,6 +176,32 @@ paths:
       tags:
       - User
   /save-template:
+    post:
+      consumes:
+      - application/json
+      description: Создание нового шаблона
+      parameters:
+      - description: Template
+        in: body
+        name: template
+        required: true
+        schema:
+          $ref: '#/definitions/model.Template'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Шаблон успешно создан
+          schema:
+            type: string
+        "502":
+          description: Ошибка сервера, попробуйте позже
+          schema:
+            type: string
+      summary: SaveTemplate
+      tags:
+      - Templates
+  /update-template:
     post:
       consumes:
       - application/json
