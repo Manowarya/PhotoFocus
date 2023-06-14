@@ -300,12 +300,12 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
                               editTextExposition?.setText((templates[x].exposition.toInt()).toString())
                               contrastSeekBar?.progress = templates[x].contrast.toInt()
                               editTextContrast?.setText((templates[x].contrast.toInt()).toString())
-                              blurSeekBar?.progress = templates[x].blur.toInt()
-                              editTextBlur?.setText(templates[x].blur.toString())
-                              noiseSeekBar?.progress = templates[x].noise.toInt()
-                              editTextNoise?.setText(templates[x].noise.toString())
-                              vignetteSeekBar?.progress = templates[x].vignette.toInt()
-                              editTextVignette?.setText((templates[x].vignette).toString())
+                              blurSeekBar?.progress = (templates[x].blur).toInt()
+                              editTextBlur?.setText(templates[x].blur.toInt().toString())
+                              noiseSeekBar?.progress = (templates[x].noise).toInt()
+                              editTextNoise?.setText(templates[x].noise.toInt().toString())
+                              vignetteSeekBar?.progress = (templates[x].vignette).toInt()
+                              editTextVignette?.setText((templates[x].vignette).toInt().toString())
                               updateCorrectionParametrs()
                               ApplyEffectsTask(tone, saturation, bright, exposition, contrast, blur,  noise, vignette).execute()
                           }
@@ -430,8 +430,12 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.purple_200))
         }
 
-        val typeface = ResourcesCompat.getFont(this, R.font.nevduplenysh_regular)
-        setTextToSmallImageView(textFont_1, typeface, "Abcd")
+        val typeface_1 = ResourcesCompat.getFont(this, R.font.nevduplenysh_regular)
+        setTextToSmallImageView(textFont_1, typeface_1, "Abcd")
+        val typeface_2 = ResourcesCompat.getFont(this, R.font.srbija)
+        setTextToSmallImageView(textFont_2, typeface_2, "Abcd")
+        val typeface_3 = ResourcesCompat.getFont(this, R.font.mplus)
+        setTextToSmallImageView(textFont_3, typeface_3, "Abcd")
         fonts.setOnClickListener {
             handleTextViewClick(fonts)
             linearLayoutVisible(fontsTextLayout!!)
@@ -440,7 +444,13 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             colorToolsHSV.visibility=View.GONE
         }
         textFont_1.setOnClickListener {
-            editText.typeface = typeface
+            editText.typeface = typeface_1
+        }
+        textFont_2.setOnClickListener {
+            editText.typeface = typeface_2
+        }
+        textFont_3.setOnClickListener {
+            editText.typeface = typeface_3
         }
         backBtn?.setOnClickListener{
             onBackPressed()
@@ -452,7 +462,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         val paint = Paint()
         paint.typeface = typeface
-        paint.textSize = 30f
+        paint.textSize = 25f
         paint.color = Color.BLACK
 
         val bounds = Rect()
@@ -638,7 +648,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
         saturation = max(0.0F, saturationSeekBar!!.progress / 1F)
         bright = max(0.0F, brightSeekBar!!.progress / 1F)
         exposition = max(0.0F, expositionSeekBar!!.progress / 1F)
-        contrast = max(0.1F, contrastSeekBar!!.progress / 1F)
+        contrast = max(0.0F, contrastSeekBar!!.progress / 1F)
         blur = max(0.0F, blurSeekBar!!.progress / 1F)
         noise = max(0.0F, noiseSeekBar!!.progress / 1F)
         vignette = max(0.0F, vignetteSeekBar!!.progress / 1F)
