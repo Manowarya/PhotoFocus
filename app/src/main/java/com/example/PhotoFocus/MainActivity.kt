@@ -14,14 +14,21 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setListeners();
+        setListeners()
     }
 
     private fun setListeners() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
         binding.btnLoad.setOnClickListener {
             val intent = Intent(this, GalleryActivity::class.java)
+            intent.putExtra("screen", "guest")
+            startActivity(intent)
+        }
+        binding.btnSignIn.setOnClickListener{
+            val intent = Intent(this, Authorization::class.java)
+            startActivity(intent)
+        }
+        binding.btnRegistration.setOnClickListener {
+            val intent = Intent(this, Registration::class.java)
             startActivity(intent)
         }
     }
