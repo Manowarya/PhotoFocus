@@ -19,6 +19,9 @@ interface ApiService {
     @POST("/save-template")
     fun saveTemplate(@Body requestBody: RequestBody): Call<String>
 
+    @POST("/update-template")
+    fun updateTemplate(@Body requestBody: RequestBody): Call<String>
+
     @POST("/verification")
     fun registerUser(@Body requestBody: RequestBody): Call<String>
 

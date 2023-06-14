@@ -69,7 +69,16 @@ class UserTemplates : AppCompatActivity() {
                 textChange!!.text = formatText
                 btnApply.setOnClickListener {
                     changeTemplates?.visibility = View.GONE
-                    //вызов функции для изменения
+                    updateTemplate(nameChangeTemplates,
+                        id,
+                        tone,
+                        saturation,
+                        bright,
+                        exposition,
+                        contrast,
+                        blur,
+                        noise,
+                        vignette)
                 }
                 btnCreateNew.setOnClickListener {
                     changeTemplates?.visibility = View.GONE
@@ -142,6 +151,56 @@ class UserTemplates : AppCompatActivity() {
         )
 
         retrofitService.retrofit.saveTemplate(body).enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if (response.code() == 201) {
+                    val bundle = Bundle()
+                    val intent = Intent(this@UserTemplates, GalleryActivity::class.java)
+                    bundle.putString("id", userId)
+                    bundle.putString("screen", "authorization")
+                    intent.putExtras(bundle)
+                    startActivity(intent)
+                }
+                if (response.code() == 502) {
+                    Toast.makeText(this@UserTemplates,
+                        "Ошибка сервера, попробуйте позже",
+                        Toast.LENGTH_SHORT).show();
+                    return
+                }
+            }
+            override fun onFailure(call: Call<String>, t: Throwable) {}
+        })
+    }
+
+    private fun updateTemplate(
+        name: String,
+        userId: String,
+        tone: Float,
+        saturation: Float,
+        bright: Float,
+        exposition: Float,
+        contrast: Float,
+        blur: Float,
+        noise: Float,
+        vignette: Float
+    ) {
+        val jsonObject = JSONObject()
+        jsonObject.put("name", name)
+        jsonObject.put("user_id", userId.toInt())
+        jsonObject.put("tone", tone)
+        jsonObject.put("saturation", saturation)
+        jsonObject.put("bright", bright)
+        jsonObject.put("exposition", exposition)
+        jsonObject.put("contrast", contrast)
+        jsonObject.put("blur", blur)
+        jsonObject.put("noise", noise)
+        jsonObject.put("vignette", vignette)
+
+        val body = RequestBody.create(
+            "application/json".toMediaTypeOrNull(),
+            jsonObject.toString()
+        )
+
+        retrofitService.retrofit.updateTemplate(body).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 201) {
                     val bundle = Bundle()
