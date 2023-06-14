@@ -4,7 +4,7 @@ import (
 	"GoProject/database/model"
 	"database/sql"
 	"fmt"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"net/http"
@@ -36,16 +36,37 @@ func (s *smtpServer) Address() string {
 	return s.host + ":" + s.port
 }
 
+// GetTemplate отправляет шаблон.
+// @Summary GetTemplate
+// @Description Отправляет шаблон по индефикатору пользователя
+// @Tags Templates
+// @Accept  json
+// @Produce  json
+// @Param id path string true "User ID"
+// @Success 200 {object} model.Templates
+// @Failure 502 {string} string "Ошибка сервера, попробуйте позже"
+// @Router /get-templates/{id} [get]
 func GetTemplate(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		prices, err := model.GetTemplates(db, "1")
+		id := c.Param("id")
+		templates, err := model.GetTemplates(db, id)
 		if err != nil {
-			return c.JSON(http.StatusBadGateway, err)
+			return c.JSON(http.StatusBadGateway, "Ошибка сервера, попробуйте позже")
 		}
-		return c.JSON(http.StatusOK, prices)
+		return c.JSON(http.StatusOK, templates)
 	}
 }
 
+// SaveTemplate сохраняет новый шаблон.
+// @Summary SaveTemplate
+// @Description Создание нового шаблона
+// @Tags Templates
+// @Accept  json
+// @Produce  json
+// @Param template body model.Template true "Template"
+// @Success 201 {string} string "Шаблон успешно создан"
+// @Failure 502 {string} string "Ошибка сервера, попробуйте позже"
+// @Router /save-template [post]
 func SaveTemplate(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := model.SaveTemplate(db, c); err != nil {
@@ -56,11 +77,53 @@ func SaveTemplate(db *sql.DB) echo.HandlerFunc {
 	}
 }
 
+// UpdateTemplate изменяет шаблон.
+// @Summary UpdateTemplate
+// @Description Изменение шаблона
+// @Tags Templates
+// @Accept  json
+// @Produce  json
+// @Param template body model.Template true "Template"
+// @Success 201 {string} string "Шаблон изменен"
+// @Failure 502 {string} string "Ошибка сервера, попробуйте позже"
+// @Router /save-template [post]
+func UpdateTemplate(db *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if err := model.UpdateTemplate(db, c); err != nil {
+			return c.JSON(http.StatusBadGateway, "Ошибка сервера, попробуйте позже")
+
+		}
+		return c.JSON(http.StatusCreated, "Шаблон изменен")
+	}
+}
+
+func DeleteTemplate(db *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if err := model.DeleteTemplate(db, c); err != nil {
+			return c.JSON(http.StatusBadGateway, "Ошибка сервера, попробуйте позже")
+
+		}
+		return c.JSON(http.StatusCreated, "Шаблон удален")
+	}
+}
+
+// VerificationEmail отправляет код подтверждения.
+// @Summary VerificationEmail
+// @Description Отправляет код подтверждения при помощи smtp.gmail.com на почту пользователя
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param user body model.User true "User"
+// @Success 200 {string} string "Код успешно отправлен"
+// @Failure 400 {string} string "Некорректный запрос"
+// @Failure 409 {string} string "Пользователь с такой почтой уже существует"
+// @Failure 500 {string} string "Проверте корректность почты или попробуйте позже"
+// @Router /verification [post]
 func VerificationEmail(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := new(model.User)
 		if err := c.Bind(user); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(http.StatusBadRequest, "Некорректный запрос")
 		}
 
 		if !IsUniqueEmail(db, user.Email) {
@@ -85,23 +148,34 @@ func VerificationEmail(db *sql.DB) echo.HandlerFunc {
 		fmt.Println(emails[user.Email].time)
 		fmt.Println(len(emails))
 
-		return c.JSON(http.StatusOK, "Code sent successfully")
+		return c.JSON(http.StatusOK, "Код успешно отправлен")
 	}
 }
 
+// RegisterUser регистрация пользователя.
+// @Summary RegisterUser
+// @Description После ввода кода подтверждения регистрирует пользователя
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param user body UserWithCode true "User"
+// @Success 201 {int} int userID
+// @Failure 400 {string} string "Некорректный запрос"
+// @Failure 408 {string} string "Неверный код, попробуйте заново"
+// @Failure 500 {string} string "Ошибка сервера, попробуйте позже"
+// @Router /register [post]
 func RegisterUser(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := new(UserWithCode)
 		if err := c.Bind(user); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(http.StatusBadRequest, "Некорректный запрос")
 		}
 
 		if emails[user.Email].code == user.Code {
 			insertQuery := "INSERT INTO users (email, password) VALUES (?, ?)"
 			result, err := db.Exec(insertQuery, user.Email, emails[user.Email].password)
 			if err != nil {
-				fmt.Printf("Failed to insert user into database: %v\n", err)
-				return c.JSON(http.StatusInternalServerError, err)
+				return c.JSON(http.StatusInternalServerError, "Ошибка сервера, попробуйте позже")
 			}
 			delete(emails, user.Email)
 			userID, _ := result.LastInsertId()
@@ -112,22 +186,34 @@ func RegisterUser(db *sql.DB) echo.HandlerFunc {
 	}
 }
 
+// AuthorizationUser авторизация пользователя.
+// @Summary AuthorizationUser
+// @Description Авторизация пользователя
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param user body model.User true "User"
+// @Success 200 {int} int userID
+// @Failure 400 {string} string "Некорректный запрос"
+// @Failure 401 {string} string "Пользователя с такой почтой не существует"
+// @Failure 409 {string} string "Неверный пароль"
+// @Router /authorization [post]
 func AuthorizationUser(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := new(model.User)
 		if err := c.Bind(user); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(http.StatusBadRequest, "Некорректный запрос")
 		}
 
 		query := "SELECT id, password FROM users WHERE email = ?"
 		var id int
 		var hashPassword string
 		if err := db.QueryRow(query, user.Email).Scan(&id, &hashPassword); err != nil {
-			return c.JSON(http.StatusUnauthorized, err)
+			return c.JSON(http.StatusUnauthorized, "Пользователя с такой почтой не существует")
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(user.Password)); err != nil {
-			return c.JSON(http.StatusConflict, err)
+			return c.JSON(http.StatusConflict, "Неверный пароль")
 		}
 
 		return c.JSON(http.StatusOK, id)
@@ -135,7 +221,7 @@ func AuthorizationUser(db *sql.DB) echo.HandlerFunc {
 }
 
 func IsUniqueEmail(db *sql.DB, email string) bool {
-	query := "SELECT id, FROM users WHERE email = ?"
+	query := "SELECT id FROM users WHERE email = ?"
 	var id int
 	err := db.QueryRow(query, email).Scan(&id)
 	if err != nil {

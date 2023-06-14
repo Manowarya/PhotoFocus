@@ -6,7 +6,7 @@ import (
 )
 
 func Initialize() *sql.DB {
-	db, err := sql.Open("mysql", "root:assassin123and123@/photofocusdb")
+	db, err := sql.Open("mysql", "root:ZtanSNfZu4J905z04ON8@tcp(containers-us-west-72.railway.app:6891)/railway")
 
 	if err != nil {
 		panic("Error connecting to database")
@@ -30,22 +30,34 @@ func Migrate(db *sql.DB) {
 
 	templateSql := `
     CREATE TABLE IF NOT EXISTS templates(
-		id INT PRIMARY KEY AUTO_INCREMENT,
+		name VARCHAR(8) NOT NULL,
 		user_id INT NOT NULL,
-		text VARCHAR(100) NOT NULL, 
-		font_size INT NOT NULL,
-		text_color VARCHAR(30) NOT NULL,
-		font VARCHAR(30) NOT NULL,
-		light DOUBLE NOT NULL,
-		bokeh DOUBLE NOT NULL, 
-		color DOUBLE NOT NULL,
-		grain DOUBLE NOT NULL,
-		vignette DOUBLE NOT NULL,
+		tone FLOAT NOT NULL,
+		saturation FLOAT NOT NULL, 
+		bright FLOAT NOT NULL,
+		exposition FLOAT NOT NULL,
+		contrast FLOAT NOT NULL,
+		blur FLOAT NOT NULL,
+		noise FLOAT NOT NULL,
+		vignette FLOAT NOT NULL,
+		PRIMARY KEY (name, user_id),
 		FOREIGN KEY (user_id) REFERENCES users (id)
 	);
     `
 
 	_, err = db.Exec(templateSql)
+	if err != nil {
+		panic(err)
+	}
+
+	fontSql := `
+    CREATE TABLE IF NOT EXISTS font(
+		font_id INT PRIMARY KEY AUTO_INCREMENT,
+    	font MEDIUMBLOB NOT NULL
+	);
+    `
+
+	_, err = db.Exec(fontSql)
 	if err != nil {
 		panic(err)
 	}
