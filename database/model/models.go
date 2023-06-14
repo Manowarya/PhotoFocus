@@ -28,6 +28,11 @@ type Templates struct {
 	Templates []Template `json:"templates"`
 }
 
+type Font struct {
+	FontId int64   `json:"font_id"`
+	Font   []uint8 `json:"font"`
+}
+
 func GetTemplates(db *sql.DB, userId string) (Templates, error) {
 	templates := Templates{}
 
@@ -59,6 +64,13 @@ func GetTemplates(db *sql.DB, userId string) (Templates, error) {
 	}
 
 	return templates, err
+}
+
+func GetFont(db *sql.DB, userId string) (Font, error) {
+	font := Font{}
+	err := db.QueryRow("SELECT font_id, font  FROM templates WHERE font_id=?", userId).Scan(&font.FontId, &font.Font)
+
+	return font, err
 }
 
 func SaveTemplate(db *sql.DB, c echo.Context) error {

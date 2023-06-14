@@ -45,6 +45,7 @@ func main() {
 	})
 
 	e.GET("/get-templates/:id", routes.GetTemplate(db))
+	e.GET("/get-font/:id", routes.GetFont(db))
 	e.POST("/save-template", routes.SaveTemplate(db))
 	e.POST("/update-template", routes.UpdateTemplate(db))
 	e.POST("/delete-template", routes.DeleteTemplate(db))

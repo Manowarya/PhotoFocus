@@ -108,6 +108,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/get-font/{id}": {
+            "get": {
+                "description": "Отправляет шрифт по индефикатору",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fonts"
+                ],
+                "summary": "GetFont",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Font ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Font"
+                        }
+                    },
+                    "502": {
+                        "description": "Ошибка сервера, попробуйте позже",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/get-templates/{id}": {
             "get": {
                 "description": "Отправляет шаблон по индефикатору пользователя",
@@ -332,6 +370,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.Font": {
+            "type": "object",
+            "properties": {
+                "font": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "font_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Template": {
             "type": "object",
             "properties": {
