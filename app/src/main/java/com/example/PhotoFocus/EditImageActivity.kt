@@ -430,8 +430,12 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             editText.setTextColor(ContextCompat.getColor(applicationContext, R.color.purple_200))
         }
 
-        val typeface = ResourcesCompat.getFont(this, R.font.nevduplenysh_regular)
-        setTextToSmallImageView(textFont_1, typeface, "Abcd")
+        val typeface_1 = ResourcesCompat.getFont(this, R.font.nevduplenysh_regular)
+        setTextToSmallImageView(textFont_1, typeface_1, "Abcd")
+        val typeface_2 = ResourcesCompat.getFont(this, R.font.srbija)
+        setTextToSmallImageView(textFont_2, typeface_2, "Abcd")
+        val typeface_3 = ResourcesCompat.getFont(this, R.font.mplus)
+        setTextToSmallImageView(textFont_3, typeface_3, "Abcd")
         fonts.setOnClickListener {
             handleTextViewClick(fonts)
             linearLayoutVisible(fontsTextLayout!!)
@@ -440,7 +444,13 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
             colorToolsHSV.visibility=View.GONE
         }
         textFont_1.setOnClickListener {
-            editText.typeface = typeface
+            editText.typeface = typeface_1
+        }
+        textFont_2.setOnClickListener {
+            editText.typeface = typeface_2
+        }
+        textFont_3.setOnClickListener {
+            editText.typeface = typeface_3
         }
         backBtn?.setOnClickListener{
             onBackPressed()
@@ -452,7 +462,7 @@ class EditImageActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, 
 
         val paint = Paint()
         paint.typeface = typeface
-        paint.textSize = 30f
+        paint.textSize = 25f
         paint.color = Color.BLACK
 
         val bounds = Rect()

@@ -90,10 +90,12 @@ class TextModel {
         val textColor = editText.currentTextColor
         val textPaddingLeft = editText.paddingLeft
         val textPaddingTop = editText.paddingTop
+        val textFont = editText.typeface
 
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         paint.textSize = textSize
         paint.color = textColor
+        paint.typeface = textFont
 
         val textBounds = Rect()
         paint.getTextBounds(text, 0, text.length, textBounds)
@@ -133,6 +135,7 @@ class TextModel {
         val adjustedPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         adjustedPaint.textSize = adjustedTextSize
         adjustedPaint.color = textColor
+        adjustedPaint.typeface = textFont
 
         val adjustedTextBounds = Rect()
         adjustedPaint.getTextBounds(text, 0, text.length, adjustedTextBounds)
