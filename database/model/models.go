@@ -2,30 +2,30 @@ package model
 
 import (
 	"database/sql"
+	"github.com/labstack/echo/v4"
+	"net/http"
 )
 
 type User struct {
-	ID       int64  `json:"id"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type Template struct {
-	ID        int64   `json:"id"`
-	UserId    int64   `json:"id"`
-	Text      string  `json:"text"`
-	FontSize  int64   `json:"font_size"`
-	TextColor string  `json:"text_color"`
-	Font      string  `json:"font"`
-	Light     float32 `json:"light"`
-	Bokeh     float32 `json:"bokeh"`
-	Color     float32 `json:"color"`
-	Grain     float32 `json:"grain"`
-	Vignette  float32 `json:"vignette"`
+	Name       string  `json:"name"`
+	UserId     int64   `json:"user_id"`
+	Tone       float32 `json:"tone"`
+	Saturation float32 `json:"saturation"`
+	Bright     float32 `json:"bright"`
+	Exposition float32 `json:"exposition"`
+	Contrast   float32 `json:"contrast"`
+	Blur       float32 `json:"blur"`
+	Noise      float32 `json:"noise"`
+	Vignette   float32 `json:"vignette"`
 }
 
 type Templates struct {
-	Templates []Template `json:"items"`
+	Templates []Template `json:"templates"`
 }
 
 func GetTemplates(db *sql.DB, userId string) (Templates, error) {
@@ -35,23 +35,21 @@ func GetTemplates(db *sql.DB, userId string) (Templates, error) {
 		return templates, nil
 	}
 
-	rows, err := db.Query("SELECT * FROM templates WHERE user_id=?", userId)
+	rows, err := db.Query("SELECT name, tone, saturation, bright, exposition, contrast, blur, noise, vignette  FROM templates WHERE user_id=?", userId)
 
 	defer rows.Close()
 
 	for rows.Next() {
 		template := Template{}
 		err = rows.Scan(
-			&template.ID,
-			&template.UserId,
-			&template.Text,
-			&template.FontSize,
-			&template.TextColor,
-			&template.Font,
-			&template.Light,
-			&template.Bokeh,
-			&template.Color,
-			&template.Grain,
+			&template.Name,
+			&template.Tone,
+			&template.Saturation,
+			&template.Bright,
+			&template.Exposition,
+			&template.Contrast,
+			&template.Blur,
+			&template.Noise,
 			&template.Vignette)
 		if err != nil {
 			return templates, err
@@ -61,4 +59,51 @@ func GetTemplates(db *sql.DB, userId string) (Templates, error) {
 	}
 
 	return templates, err
+}
+
+func SaveTemplate(db *sql.DB, c echo.Context) error {
+	template := new(Template)
+	if err := c.Bind(template); err != nil {
+		return err
+	}
+
+	insertQuery := "INSERT INTO templates (name, user_id, tone, saturation, bright, exposition, contrast, blur, noise, vignette) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	_, err := db.Exec(insertQuery, template.Name, template.UserId, template.Tone, template.Saturation, template.Bright, template.Exposition, template.Contrast, template.Blur, template.Noise, template.Vignette)
+
+	return err
+}
+
+func UpdateTemplate(db *sql.DB, c echo.Context) error {
+	template := new(Template)
+	if err := c.Bind(template); err != nil {
+		return err
+	}
+
+	updateQuery := "UPDATE templates SET tone = ?, saturation= ?, bright= ?, exposition= ?, contrast= ?, blur= ?, noise= ?, vignette= ? WHERE user_id=? and name = ?"
+	_, err := db.Exec(updateQuery, template.Tone, template.Saturation, template.Bright, template.Exposition, template.Contrast, template.Blur, template.Noise, template.Vignette, template.UserId, template.Name)
+
+	return err
+}
+
+func DeleteTemplate(db *sql.DB, c echo.Context) error {
+	template := new(Template)
+	if err := c.Bind(template); err != nil {
+		return err
+	}
+	_, err := db.Exec("DELETE FROM templates WHERE user_id=? and name = ?", template.UserId, template.Name)
+
+	return err
+}
+
+func CreateUser(c echo.Context) error {
+	user := new(User)
+	if err := c.Bind(user); err != nil {
+		return err
+	}
+
+	createdUser := &User{
+		Password: user.Password,
+	}
+
+	return c.JSON(http.StatusCreated, createdUser)
 }
