@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
@@ -83,42 +84,45 @@ class EditImageModel(private val activity: EditImageActivity) {
         myAutocorrect(dstBitmap!!, dstBitmap!!)
     }
 
+    var toneText: Float? = null
     fun applyEffects(tone: Float, saturation: Float, bright: Float, exposition: Float, contrast: Float, blur: Float, noise: Float, vignette: Float): Bitmap {
 
         val tempBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
 
-        val shouldApplyTone = tone > 0.0F
-        val shouldApplySaturation = saturation > 0.0F
-        val shouldApplyBright = bright > 0.0F
-        val shouldApplyExposition = exposition > 0.0F
-        val shouldApplyContrast = contrast > 0.0F
-        val shouldApplyBlur = blur > 0.0F
-        val shouldApplyNoise = noise > 0.0F
-        val shouldApplyVignette = vignette > 0.0F
+        toneText = noise
+
+        val shouldApplyTone = tone != 0.0F
+        val shouldApplySaturation = saturation != 0.0F
+        val shouldApplyBright = bright != 0.0F
+        val shouldApplyExposition = exposition != 0.0F
+        val shouldApplyContrast = contrast != 0.0F
+        val shouldApplyBlur = blur != 0.0F
+        val shouldApplyNoise = noise != 0.0F
+        val shouldApplyVignette = vignette != 0.0F
 
         if (shouldApplyTone) {
-            myTone(tempBitmap, tempBitmap, tone - 10F)
+            myTone(tempBitmap, tempBitmap, (tone-100) / 10)
         }
         if (shouldApplySaturation) {
-            mySaturation(tempBitmap, tempBitmap, saturation - 10F)
+            mySaturation(tempBitmap, tempBitmap, (saturation - 100) / 10)
         }
         if (shouldApplyBright) {
-            myBright(tempBitmap, tempBitmap, bright - 10F)
+            myBright(tempBitmap, tempBitmap, (bright - 100)/10)
         }
         if (shouldApplyExposition) {
-            myExposition(tempBitmap, tempBitmap, exposition - 10F)
+            myExposition(tempBitmap, tempBitmap, (exposition-100) / 10)
         }
         if (shouldApplyContrast) {
-            myContrast(tempBitmap, tempBitmap, contrast - 10F)
+            myContrast(tempBitmap, tempBitmap, (contrast-100) / 10)
         }
         if (shouldApplyBlur) {
-            myBlur(tempBitmap, tempBitmap, blur)
+            myBlur(tempBitmap, tempBitmap, blur / 10)
         }
         if (shouldApplyNoise) {
-            myNoise(tempBitmap, tempBitmap, noise)
+            myNoise(tempBitmap, tempBitmap, noise / 10)
         }
         if (shouldApplyVignette) {
-            myVignette(tempBitmap, tempBitmap, vignette)
+            myVignette(tempBitmap, tempBitmap, vignette / 10)
         }
         dstBitmap = tempBitmap
         return tempBitmap

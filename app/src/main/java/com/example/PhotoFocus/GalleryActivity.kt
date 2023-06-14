@@ -15,7 +15,6 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.GridLayoutManager
 
 class GalleryActivity : AppCompatActivity() {
-
     private var imageRecycler:RecyclerView?=null
     private var allPictures:ArrayList<Image>?=null
 
@@ -39,12 +38,13 @@ class GalleryActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(permission), 101)
         }
         val screen = intent.getStringExtra("screen")
+        val id = intent.getStringExtra("id")
 
         allPictures = ArrayList()
         if(allPictures!!.isEmpty()){
             allPictures=getAllImages()
 
-            imageRecycler?.adapter=GalleryAdapter(this, allPictures!!, screen!!)
+            imageRecycler?.adapter=GalleryAdapter(this, allPictures!!, screen!!, id)
         }
         signIn = findViewById(R.id.btnSignInGallery)
         if (screen == "authorization") {
