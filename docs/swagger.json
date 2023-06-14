@@ -3,7 +3,7 @@
     "info": {
         "title": "PhotoFocus API",
         "contact": {},
-        "version": "1.0.5"
+        "version": "1.0.0"
     },
     "host": "photofocus-production.up.railway.app",
     "paths": {
@@ -52,6 +52,46 @@
                     },
                     "409": {
                         "description": "Неверный пароль",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/delete-template": {
+            "post": {
+                "description": "Удаление шаблона",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "DeleteTemplate",
+                "parameters": [
+                    {
+                        "description": "TemplateID",
+                        "name": "template",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/routes.TemplateID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Шаблон удален",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "502": {
+                        "description": "Ошибка сервера, попробуйте позже",
                         "schema": {
                             "type": "string"
                         }
@@ -150,6 +190,46 @@
             }
         },
         "/save-template": {
+            "post": {
+                "description": "Создание нового шаблона",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "SaveTemplate",
+                "parameters": [
+                    {
+                        "description": "Template",
+                        "name": "template",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Template"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Шаблон успешно создан",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "502": {
+                        "description": "Ошибка сервера, попробуйте позже",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/update-template": {
             "post": {
                 "description": "Изменение шаблона",
                 "consumes": [
@@ -297,6 +377,17 @@
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "routes.TemplateID": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
