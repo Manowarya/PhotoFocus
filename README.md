@@ -18,7 +18,7 @@
 
 [Техническое задание](https://github.com/Manowarya/PhotoFocus/blob/main/documentation/Technical%20specification_PhotoFocus.pdf)
 
-[Видеопрезентация проекта](https://github.com/Manowarya/PhotoFocus/blob/main/documentation/Видеопрезентация.rar)
+[Видеопрезентация проекта](https://github.com/Manowarya/PhotoFocus/blob/main/documentation/Итоговая%20видеопрезентация.rar)
 
 [Презентация](https://github.com/Manowarya/PhotoFocus/blob/main/documentation/Photofocus.pptx)
 
